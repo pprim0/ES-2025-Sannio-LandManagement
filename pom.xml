@@ -33,8 +33,8 @@
         <spotbugs.version>4.8.6.0</spotbugs.version>
         
         <!-- SonarCloud properties -->
-        <sonar.organization>YOUR_ORG</sonar.organization>
-        <sonar.projectKey>YOUR_PROJECT_KEY</sonar.projectKey>
+        <sonar.organization>pprim0</sonar.organization>
+        <sonar.projectKey>pprim0_ES-2025-Sannio-LandManagement</sonar.projectKey>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.coverage.jacoco.xmlReportPaths>
             ${project.build.directory}/site/jacoco/jacoco.xml
