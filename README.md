@@ -268,7 +268,7 @@ Este projeto está licenciado sob a **MIT License** - ver ficheiro [LICENSE](LIC
 - [GitHub Repository](https://github.com/pprim0/ES-2025-Sannio-LandManagement)
 - [SonarCloud Dashboard](https://sonarcloud.io/summary/new_code?id=pprim0_ES-2025-Sannio-LandManagement)
 - [GitHub Actions](https://github.com/pprim0/ES-2025-Sannio-LandManagement/actions)
-- [Trello Board]([https://trello.com/b/YOUR_BOARD_ID](https://trello.com/invite/b/68fba69caf3f988583cea0bc/ATTI50dc938ef73dfa2a74af35327e3063ea5A0BFC13/es-2025-land-management-system))
+- [Trello Board](https://trello.com/b/uyY3kYgO/es-2025-land-management-system)
 
 ---
 
