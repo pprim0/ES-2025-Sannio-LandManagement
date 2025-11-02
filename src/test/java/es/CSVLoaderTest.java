@@ -16,7 +16,7 @@ public class CSVLoaderTest {
      */
     @Test
     public void testCarregarPropriedadesComCSVValido() {
-        List<Propriedade> propriedades = CSVLoader.carregarPropriedades("Madeira-Moodle-1.1.csv");
+        List<Propriedade> propriedades = CSVLoader.carregarPropriedades("data/Madeira-Moodle-1.1.csv");
         assertNotNull(propriedades, "A lista não deveria ser nula");
         assertFalse(propriedades.isEmpty(), "A lista não deveria estar vazia");
         assertNotNull(propriedades.get(0).getOwner(), "O proprietário não deveria ser nulo");
@@ -27,7 +27,7 @@ public class CSVLoaderTest {
      */
     @Test
     public void testPropriedadeTemAreaValida() {
-        List<Propriedade> propriedades = CSVLoader.carregarPropriedades("Madeira-Moodle-1.1.csv");
+        List<Propriedade> propriedades = CSVLoader.carregarPropriedades("data/Madeira-Moodle-1.1.csv");
         assertFalse(propriedades.isEmpty(), "A lista de propriedades não deveria estar vazia");
         assertTrue(propriedades.get(0).getShapeArea() > 0, "A área da propriedade deve ser maior que 0");
     }
