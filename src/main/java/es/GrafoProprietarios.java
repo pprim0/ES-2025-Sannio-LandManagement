@@ -1,102 +1,74 @@
 package es;
 
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
 import java.util.*;
 
-/**
- * Classe responsável por construir um grafo de vizinhança entre proprietários.
- * Dois proprietários são vizinhos se possuem propriedades adjacentes.
- */
 public class GrafoProprietarios {
 
-    private final Graph<String, DefaultEdge> grafo;
-    
-    /**
-     * Constrói o grafo de proprietários a partir do grafo de adjacências de propriedades.
-     * 
-     * @param grafoAdjacencias Grafo de adjacências entre propriedades
-     */
+    private final Map<String, Set<String>> adjacencias;
+    private final Map<String, Integer> numPropriedades;
+
     public GrafoProprietarios(GrafoAdjacencias grafoAdjacencias) {
-        this.grafo = new SimpleGraph<>(DefaultEdge.class);
-        construirGrafo(grafoAdjacencias);
+        this.adjacencias = new HashMap<>();
+        this.numPropriedades = new HashMap<>();
+        construir(grafoAdjacencias);
     }
-    
-    private void construirGrafo(GrafoAdjacencias grafoAdjacencias) {
-        Graph<Propriedade, DefaultEdge> grafoProp = grafoAdjacencias.getGrafo();
+
+    private void construir(GrafoAdjacencias grafoAdjacencias) {
+        Set<Propriedade> vertices = grafoAdjacencias.getVertices();
         
-        // Adicionar todos os proprietários como vértices
-        Set<String> proprietarios = new HashSet<>();
-        for (Propriedade p : grafoProp.vertexSet()) {
+        for (Propriedade p : vertices) {
             String owner = p.getOwner();
-            if (owner != null && !owner.isEmpty()) {
-                proprietarios.add(owner);
-            }
+            numPropriedades.put(owner, numPropriedades.getOrDefault(owner, 0) + 1);
         }
         
-        for (String owner : proprietarios) {
-            grafo.addVertex(owner);
-        }
-        
-        // Para cada aresta no grafo de propriedades
-        for (DefaultEdge edge : grafoProp.edgeSet()) {
-            Propriedade p1 = grafoProp.getEdgeSource(edge);
-            Propriedade p2 = grafoProp.getEdgeTarget(edge);
+        for (Propriedade p1 : vertices) {
+            String dono1 = p1.getOwner();
+            Set<Propriedade> vizinhas = grafoAdjacencias.getVizinhos(p1);
             
-            String owner1 = p1.getOwner();
-            String owner2 = p2.getOwner();
-            
-            // Criar aresta entre proprietários diferentes
-            if (owner1 != null && owner2 != null && 
-                !owner1.equals(owner2) && 
-                !grafo.containsEdge(owner1, owner2)) {
-                grafo.addEdge(owner1, owner2);
+            for (Propriedade p2 : vizinhas) {
+                String dono2 = p2.getOwner();
+                if (!dono1.equals(dono2)) {
+                    adjacencias.computeIfAbsent(dono1, k -> new HashSet<>()).add(dono2);
+                }
             }
         }
     }
-    
-    /**
-     * Retorna o grafo JGraphT de proprietários.
-     */
-    public Graph<String, DefaultEdge> getGrafo() {
-        return grafo;
+
+    public Set<String> getVizinhos(String owner) {
+        return adjacencias.getOrDefault(owner, Collections.emptySet());
     }
-    
-    /**
-     * Retorna os proprietários vizinhos de um dado proprietário.
-     */
-    public Set<String> getVizinhos(String proprietario) {
-        Set<DefaultEdge> edges = grafo.edgesOf(proprietario);
-        Set<String> vizinhos = new HashSet<>();
-        
-        for (DefaultEdge edge : edges) {
-            String source = grafo.getEdgeSource(edge);
-            String target = grafo.getEdgeTarget(edge);
-            vizinhos.add(source.equals(proprietario) ? target : source);
-        }
-        
-        return vizinhos;
+
+    public boolean saoVizinhos(String owner1, String owner2) {
+        return adjacencias.containsKey(owner1) && adjacencias.get(owner1).contains(owner2);
     }
-    
-    /**
-     * Número de proprietários no grafo.
-     */
+
+    public int getNumVizinhos(String owner) {
+        return getVizinhos(owner).size();
+    }
+
+    public Set<String> getProprietarios() {
+        return new HashSet<>(adjacencias.keySet());
+    }
+
     public int getNumProprietarios() {
-        return grafo.vertexSet().size();
+        return adjacencias.size();
     }
-    
-    /**
-     * Número de relações de vizinhança.
-     */
-    public int getNumRelacoes() {
-        return grafo.edgeSet().size();
+
+    public int getNumPropriedades(String owner) {
+        return numPropriedades.getOrDefault(owner, 0);
     }
-    
-    /**
-     * Verifica se dois proprietários são vizinhos.
-     */
-    public boolean saoVizinhos(String prop1, String prop2) {
-        return grafo.containsEdge(prop1, prop2);
+
+    public Map<String, Set<String>> getGrafoCompleto() {
+        return new HashMap<>(adjacencias);
+    }
+
+    public List<String> getProprietariosComMaisDeNVizinhos(int n) {
+        List<String> resultado = new ArrayList<>();
+        for (Map.Entry<String, Set<String>> entry : adjacencias.entrySet()) {
+            if (entry.getValue().size() > n) {
+                resultado.add(entry.getKey());
+            }
+        }
+        return resultado;
     }
 }
