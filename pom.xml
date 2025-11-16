@@ -5,7 +5,6 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-
     <groupId>com.sannio.landmanagement</groupId>
     <artifactId>land-management-system</artifactId>
     <version>1.0.0-SNAPSHOT</version>
@@ -15,8 +14,8 @@
     <description>Sistema de gestão territorial para propriedades rurais</description>
 
     <properties>
-    <maven.compiler.source>21</maven.compiler.source>
-    <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         
         <!-- Dependency versions -->
@@ -40,6 +39,11 @@
         <sonar.coverage.jacoco.xmlReportPaths>
             ${project.build.directory}/site/jacoco/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
+        
+        <!-- Excluir APENAS UI JavaFX do coverage (difícil de testar) -->
+        <sonar.coverage.exclusions>
+            **/GestaoTerritorioApp.java
+        </sonar.coverage.exclusions>
     </properties>
 
     <dependencies>
@@ -89,6 +93,7 @@
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+        
         <!-- JTS - Geometry processing -->
         <dependency>
             <groupId>org.locationtech.jts</groupId>
@@ -121,6 +126,12 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
+                <configuration>
+                    <!-- Excluir UI JavaFX do JaCoCo também -->
+                    <excludes>
+                        <exclude>**/GestaoTerritorioApp.class</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -138,51 +149,6 @@
                 </executions>
             </plugin>
 
-            <!-- Checkstyle - Configurado para não falhar build -->
-            <!--<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${checkstyle.version}</version>
-                <configuration>
-                    <configLocation>sun_checks.xml</configLocation>
-                    <consoleOutput>true</consoleOutput>
-                    <failsOnError>false</failsOnError>
-                    <violationSeverity>warning</violationSeverity>
-                    <logViolationsToConsole>false</logViolationsToConsole>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>validate</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
-            <!-- SpotBugs - Versão atualizada para Java 21 -->
-            <!--<plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>${spotbugs.version}</version>
-                <configuration>
-                    <effort>Max</effort>
-                    <threshold>Low</threshold>
-                    <failOnError>false</failOnError>
-                    <xmlOutput>true</xmlOutput>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>analyze-compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
             <!-- JavaFX Maven Plugin -->
             <plugin>
                 <groupId>org.openjfx</groupId>
