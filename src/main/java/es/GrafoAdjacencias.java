@@ -12,44 +12,64 @@ import java.util.*;
 public class GrafoAdjacencias {
     
     private Graph<Propriedade, DefaultEdge> grafo;
-    private WKTReader wktReader;
+    private Map<Propriedade, Geometry> geometriaCache;
 
     public GrafoAdjacencias(List<Propriedade> propriedades) {
         this.grafo = new SimpleGraph<>(DefaultEdge.class);
-        this.wktReader = new WKTReader();
+        this.geometriaCache = new HashMap<>();
         construirGrafo(propriedades);
     }
 
     private void construirGrafo(List<Propriedade> propriedades) {
+        WKTReader wktReader = new WKTReader();
+        
+        System.out.println("[INFO] Parseando geometrias...");
+        long inicio = System.currentTimeMillis();
+        
+        // 1. PARSEAR TODAS AS GEOMETRIAS UMA ÚNICA VEZ (cache)
         for (Propriedade p : propriedades) {
             grafo.addVertex(p);
-        }
-
-        for (int i = 0; i < propriedades.size(); i++) {
-            Propriedade p1 = propriedades.get(i);
-            Geometry geom1 = parseGeometry(p1.getGeometry());
             
-            if (geom1 == null) continue;
-
-            for (int j = i + 1; j < propriedades.size(); j++) {
-                Propriedade p2 = propriedades.get(j);
-                Geometry geom2 = parseGeometry(p2.getGeometry());
+            try {
+                Geometry geom = wktReader.read(p.getGeometry());
+                if (geom != null && geom.isValid()) {
+                    geometriaCache.put(p, geom);
+                }
+            } catch (ParseException e) {
+                // Geometria inválida, não adiciona ao cache
+            }
+        }
+        
+        long tempoParse = System.currentTimeMillis() - inicio;
+        System.out.println("[INFO] Geometrias parseadas em " + tempoParse + "ms");
+        System.out.println("[INFO] Construindo adjacencias...");
+        
+        inicio = System.currentTimeMillis();
+        
+        // 2. CONSTRUIR ADJACÊNCIAS USANDO GEOMETRIAS JÁ PARSEADAS
+        List<Propriedade> propriedadesValidas = new ArrayList<>(geometriaCache.keySet());
+        
+        for (int i = 0; i < propriedadesValidas.size(); i++) {
+            Propriedade p1 = propriedadesValidas.get(i);
+            Geometry geom1 = geometriaCache.get(p1);
+            
+            for (int j = i + 1; j < propriedadesValidas.size(); j++) {
+                Propriedade p2 = propriedadesValidas.get(j);
+                Geometry geom2 = geometriaCache.get(p2);
                 
-                if (geom2 == null) continue;
-
                 if (geom1.intersects(geom2)) {
                     grafo.addEdge(p1, p2);
                 }
             }
+            
+            // Progress indicator a cada 100 propriedades
+            if ((i + 1) % 100 == 0) {
+                System.out.println("[INFO] Processadas " + (i + 1) + "/" + propriedadesValidas.size() + " propriedades");
+            }
         }
-    }
-
-    private Geometry parseGeometry(String wkt) {
-        try {
-            return wktReader.read(wkt);
-        } catch (ParseException e) {
-            return null;
-        }
+        
+        long tempoAdjacencias = System.currentTimeMillis() - inicio;
+        System.out.println("[INFO] Adjacencias construidas em " + (tempoAdjacencias / 1000) + "s");
     }
 
     public int getNumVertices() {
