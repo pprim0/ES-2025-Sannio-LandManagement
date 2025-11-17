@@ -42,7 +42,8 @@
         
         <!-- Excluir APENAS UI JavaFX do coverage (difícil de testar) -->
         <sonar.coverage.exclusions>
-            **/GestaoTerritorioApp.java
+            **/GestaoTerritorioApp.java,
+            **/TestarExportadores.java
         </sonar.coverage.exclusions>
     </properties>
 
@@ -130,6 +131,7 @@
                     <!-- Excluir UI JavaFX do JaCoCo também -->
                     <excludes>
                         <exclude>**/GestaoTerritorioApp.class</exclude>
+                        <exclude>**/TestarExportadores.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>
