@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Pattern;  // ← ADICIONAR ESTE IMPORT
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -143,7 +144,11 @@ public class TestarExportadoresTest {
         // Verificar que mostra estatísticas
         assertTrue(conteudo.contains("Propriedades") || conteudo.contains("propriedades"),
                    "Deveria mencionar propriedades");
-        assertTrue(conteudo.matches(".*\\d+.*"),
+        
+        // CORREÇÃO: Usar Pattern.find() em vez de matches()
+        // Razão: matches() requer match da string INTEIRA, e . não corresponde a \n
+        // find() procura o padrão em qualquer parte da string (idioma correto)
+        assertTrue(Pattern.compile("\\d+").matcher(conteudo).find(),
                    "Deveria conter números (estatísticas)");
     }
 
