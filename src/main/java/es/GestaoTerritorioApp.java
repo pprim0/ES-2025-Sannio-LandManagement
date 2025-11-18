@@ -19,6 +19,10 @@ import java.util.stream.Collectors;
  * Aplicação JavaFX para a gestão visual de propriedades rústicas.
  * Permite carregar dados de propriedades, construir grafos de adjacência,
  * calcular áreas médias e gerar sugestões de troca entre proprietários.
+ * 
+ * VERSÃO MELHORADA:
+ * - Botões de grafo agora exportam e visualizam automaticamente
+ * - Área avançada implementada com estatísticas detalhadas
  */
 public class GestaoTerritorioApp extends Application {
 
@@ -178,25 +182,50 @@ public class GestaoTerritorioApp extends Application {
         }).start();
     }
 
+    /**
+     * MELHORADO: Agora constrói o grafo E exporta para HTML automaticamente
+     */
     private void construirGrafoAdjacencias() {
         if (propriedades == null || propriedades.isEmpty()) {
             showAlert("Aviso", "Aguarde o carregamento das propriedades!");
             return;
         }
 
-        showProgress(true, "Construindo grafo de adjacências...");
+        showProgress(true, "Construindo e exportando grafo de adjacências...");
         new Thread(() -> {
             try {
+                // Construir grafo
                 grafoAdjacencias = new GrafoAdjacencias(propriedades);
+                
+                // Exportar para HTML
+                Map<Integer, Set<Integer>> grafoMap = buildGrafoMap();
+                ExportadorAdjacenciasHTML.exportar(
+                    propriedades.subList(0, Math.min(100, propriedades.size())),
+                    grafoMap,
+                    "grafo_adjacencias.html",
+                    "adjacencias.js",
+                    100
+                );
                 
                 Platform.runLater(() -> {
                     showProgress(false, null);
-                    showAlert("Sucesso", 
-                        String.format("Grafo de Adjacências construído!\n\n" +
-                                    "Vértices: %d\n" +
-                                    "Arestas: %d",
-                                    grafoAdjacencias.getNumVertices(),
-                                    grafoAdjacencias.getNumArestas()));
+                    
+                    // Mostrar estatísticas E abrir visualização
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Grafo Construído");
+                    alert.setHeaderText("Grafo de Adjacências construído com sucesso!");
+                    alert.setContentText(String.format(
+                        "Vértices (Propriedades): %d\n" +
+                        "Arestas (Adjacências): %d\n\n" +
+                        "Visualização será aberta no browser...",
+                        grafoAdjacencias.getNumVertices(),
+                        grafoAdjacencias.getNumArestas()
+                    ));
+                    
+                    alert.showAndWait();
+                    
+                    // Abrir no browser
+                    abrirHTML("grafo_adjacencias.html");
                 });
             } catch (Exception ex) {
                 Platform.runLater(() -> {
@@ -207,26 +236,51 @@ public class GestaoTerritorioApp extends Application {
         }).start();
     }
 
+    /**
+     * MELHORADO: Agora constrói o grafo E exporta para HTML automaticamente
+     */
     private void construirGrafoProprietarios() {
         if (propriedades == null || propriedades.isEmpty()) {
             showAlert("Aviso", "Aguarde o carregamento das propriedades!");
             return;
         }
 
-        showProgress(true, "Construindo grafo de proprietários...");
+        showProgress(true, "Construindo e exportando grafo de proprietários...");
         new Thread(() -> {
             try {
+                // Construir grafo de adjacências se necessário
                 if (grafoAdjacencias == null) {
                     grafoAdjacencias = new GrafoAdjacencias(propriedades);
                 }
+                
+                // Construir grafo de proprietários
                 grafoProprietarios = new GrafoProprietarios(grafoAdjacencias);
+                
+                // Exportar para HTML
+                ExportadorProprietariosHTML.exportar(
+                    grafoProprietarios.getGrafoCompleto(),
+                    "./",
+                    "grafo_proprietarios.html",
+                    "proprietarios.js"
+                );
                 
                 Platform.runLater(() -> {
                     showProgress(false, null);
-                    showAlert("Sucesso", 
-                        String.format("Grafo de Proprietários construído!\n\n" +
-                                    "Proprietários: %d",
-                                    grafoProprietarios.getNumProprietarios()));
+                    
+                    // Mostrar estatísticas E abrir visualização
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Grafo Construído");
+                    alert.setHeaderText("Grafo de Proprietários construído com sucesso!");
+                    alert.setContentText(String.format(
+                        "Proprietários: %d\n\n" +
+                        "Visualização será aberta no browser...",
+                        grafoProprietarios.getNumProprietarios()
+                    ));
+                    
+                    alert.showAndWait();
+                    
+                    // Abrir no browser
+                    abrirHTML("grafo_proprietarios.html");
                 });
             } catch (Exception ex) {
                 Platform.runLater(() -> {
@@ -237,6 +291,9 @@ public class GestaoTerritorioApp extends Application {
         }).start();
     }
 
+    /**
+     * MELHORADO: Agora suporta cálculo avançado real com estatísticas detalhadas
+     */
     private void calcularAreaMedia(boolean avancada) {
         if (propriedades == null || propriedades.isEmpty()) {
             showAlert("Aviso", "Aguarde o carregamento das propriedades!");
@@ -255,22 +312,37 @@ public class GestaoTerritorioApp extends Application {
         String nome = escolherOpcao("Escolha " + tipo + ":", nomes);
         if (nome == null) return;
 
-        if (avancada) {
-            showAlert("Info", "Área Avançada ainda não implementada neste projeto.\nUsando cálculo simples.");
-        }
-
-        showProgress(true, "Calculando área média...");
+        showProgress(true, avancada ? "Calculando estatísticas avançadas..." : "Calculando área média...");
         new Thread(() -> {
             try {
-                double media = AreaPropriedades.calcularAreaMediaPorNivel(propriedades, tipo, nome);
-
-                final double resultado = media;
-                Platform.runLater(() -> {
-                    showProgress(false, null);
-                    showAlert("Resultado", 
-                        String.format("Área média\n%s = %s\n\n%.2f m²",
-                            tipo, nome, resultado));
-                });
+                if (avancada) {
+                    // CÁLCULO AVANÇADO - Estatísticas detalhadas
+                    AreaAvancada.EstatisticasArea stats = 
+                        AreaAvancada.calcularEstatisticasAvancadas(propriedades, tipo, nome);
+                    
+                    if (stats == null) {
+                        Platform.runLater(() -> {
+                            showProgress(false, null);
+                            showAlert("Erro", "Não foram encontradas propriedades para esta região.");
+                        });
+                        return;
+                    }
+                    
+                    Platform.runLater(() -> {
+                        showProgress(false, null);
+                        mostrarEstatisticasAvancadas(stats);
+                    });
+                } else {
+                    // CÁLCULO SIMPLES - Apenas média
+                    double media = AreaPropriedades.calcularAreaMediaPorNivel(propriedades, tipo, nome);
+                    
+                    Platform.runLater(() -> {
+                        showProgress(false, null);
+                        showAlert("Resultado", 
+                            String.format("Área média (Simples)\n%s = %s\n\n%.2f m²",
+                                tipo, nome, media));
+                    });
+                }
             } catch (Exception ex) {
                 Platform.runLater(() -> {
                     showProgress(false, null);
@@ -278,6 +350,33 @@ public class GestaoTerritorioApp extends Application {
                 });
             }
         }).start();
+    }
+
+    /**
+     * Mostra estatísticas avançadas em janela formatada
+     */
+    private void mostrarEstatisticasAvancadas(AreaAvancada.EstatisticasArea stats) {
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Estatísticas Avançadas");
+        dialog.setHeaderText("Análise Detalhada de Área");
+
+        VBox conteudo = new VBox(10);
+        conteudo.setPadding(new Insets(20));
+        conteudo.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 12px;");
+
+        Label textoStats = new Label(stats.toString());
+        textoStats.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 12px;");
+        textoStats.setWrapText(true);
+
+        conteudo.getChildren().add(textoStats);
+
+        ScrollPane scroll = new ScrollPane(conteudo);
+        scroll.setFitToWidth(true);
+        scroll.setPrefSize(500, 400);
+
+        dialog.getDialogPane().setContent(scroll);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+        dialog.showAndWait();
     }
 
     private void gerarSugestoes(boolean avancada) {
