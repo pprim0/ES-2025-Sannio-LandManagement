@@ -2,66 +2,74 @@
 <html lang="pt">
 <head>
   <meta charset="utf-8" />
-  <meta name="google" content="notranslate">
-  <title>Grafo de adjacencias</title>
-  <script type="text/javascript" src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
+  <title>Grafo de Adjacências</title>
+  <script src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
   <style>
-    #network {
-      width: 100%;
-      height: 90vh;
-      border: 1px solid lightgray;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; padding: 20px; }
+    header { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h2 { color: #333; margin-bottom: 10px; }
+    .stats { display: flex; gap: 30px; margin-top: 10px; color: #666; }
+    .stat strong { color: #667eea; font-size: 18px; }
+    .controls { background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; background: #667eea; color: white; transition: all 0.3s; }
+    .btn:hover { background: #5568d3; transform: translateY(-2px); }
+    .btn-secondary { background: #6c757d; }
+    .btn-secondary:hover { background: #5a6268; }
+    #search { padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; width: 250px; }
+    #network { width: 100%; height: calc(100vh - 280px); border: 1px solid #ddd; border-radius: 10px; background: white; }
   </style>
 </head>
 <body>
-  <h2>Grafo de Propriedades Rusticas</h2>
+  <header>
+    <h2>📍 Grafo de Adjacências de Propriedades</h2>
+    <div class="stats">
+      <div class="stat"><strong>100</strong> propriedades</div>
+      <div class="stat"><strong>18</strong> adjacências</div>
+    </div>
+  </header>
+  <div class="controls">
+    <button class="btn" onclick="zoomIn()">🔍 Zoom +</button>
+    <button class="btn" onclick="zoomOut()">🔍 Zoom -</button>
+    <button class="btn btn-secondary" onclick="resetView()">↺ Reset</button>
+    <input type="text" id="search" placeholder="Buscar propriedade (ID)..." onkeyup="searchNode()">
+  </div>
   <div id="network"></div>
   <script src="adjacencias.js"></script>
-  <script type="text/javascript">
-    const container = document.getElementById("network");
-    const data = {
-      nodes: new vis.DataSet(nodes),
-      edges: new vis.DataSet(edges)
-    };
+  <script>
+    const container = document.getElementById('network');
+    const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
     const options = {
       physics: false,
-      interaction: {
-        dragNodes: false,
-        dragView: true,
-        zoomView: true
-      },
+      interaction: { dragNodes: false, dragView: true, zoomView: true },
       nodes: {
-        shape: "dot",
-        font: {
-          size: 16,
-          face: "arial",
-          color: "#000000"
-        },
-        color: "#97C2FC"
+        shape: 'dot',
+        font: { size: 14, face: 'Segoe UI', color: '#000000' },
+        color: { background: '#97C2FC', border: '#2B7CE9', highlight: { background: '#FFA500', border: '#FF8C00' } },
+        borderWidth: 2
       },
-      edges: {
-        color: "#cccccc"
-      }
+      edges: { color: '#cccccc', width: 1 }
     };
     const network = new vis.Network(container, data, options);
-    network.once("afterDrawing", function () {
-      network.fit({
-        animation: {
-          duration: 800,
-          easingFunction: "easeInOutQuad"
-        },
-        maxZoomLevel: 2
-      });
-    });
-    network.on("click", function (params) {
+    network.once('afterDrawing', () => network.fit({ animation: { duration: 800, easingFunction: 'easeInOutQuad' }, maxZoomLevel: 2 }));
+    network.on('click', (params) => {
       if (params.nodes.length > 0) {
-        const nodeId = params.nodes[0];
-        const node = nodes.find(n => n.id === nodeId);
-        if (node && node.title) {
-          alert(node.title);
-        }
+        const node = nodes.find(n => n.id === params.nodes[0]);
+        if (node && node.title) alert(node.title);
       }
     });
+    function zoomIn() { network.moveTo({ scale: network.getScale() * 1.2, animation: { duration: 300 } }); }
+    function zoomOut() { network.moveTo({ scale: network.getScale() * 0.8, animation: { duration: 300 } }); }
+    function resetView() { network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } }); }
+    function searchNode() {
+      const searchValue = document.getElementById('search').value;
+      if (!searchValue) { network.unselectAll(); return; }
+      const nodeId = parseInt(searchValue);
+      if (!isNaN(nodeId) && nodes.find(n => n.id === nodeId)) {
+        network.selectNodes([nodeId]);
+        network.focus(nodeId, { scale: 1.5, animation: { duration: 500, easingFunction: 'easeInOutQuad' } });
+      }
+    }
   </script>
 </body>
 </html>

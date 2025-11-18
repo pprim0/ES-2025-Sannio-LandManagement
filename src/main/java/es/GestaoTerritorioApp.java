@@ -292,7 +292,7 @@ public class GestaoTerritorioApp extends Application {
     }
 
     /**
-     * MELHORADO: Agora suporta cálculo avançado real com estatísticas detalhadas
+     * MELHORADO: Agora suporta cálculo avançado com componentes conexas
      */
     private void calcularAreaMedia(boolean avancada) {
         if (propriedades == null || propriedades.isEmpty()) {
@@ -312,28 +312,35 @@ public class GestaoTerritorioApp extends Application {
         String nome = escolherOpcao("Escolha " + tipo + ":", nomes);
         if (nome == null) return;
 
-        showProgress(true, avancada ? "Calculando estatísticas avançadas..." : "Calculando área média...");
+        showProgress(true, avancada ? "Calculando área corrigida (componentes conexas)..." : "Calculando área média...");
         new Thread(() -> {
             try {
                 if (avancada) {
-                    // CÁLCULO AVANÇADO - Estatísticas detalhadas
-                    AreaAvancada.EstatisticasArea stats = 
-                        AreaAvancada.calcularEstatisticasAvancadas(propriedades, tipo, nome);
-                    
-                    if (stats == null) {
-                        Platform.runLater(() -> {
-                            showProgress(false, null);
-                            showAlert("Erro", "Não foram encontradas propriedades para esta região.");
-                        });
-                        return;
+                    // CÁLCULO AVANÇADO - Considera componentes conexas (grupos adjacentes)
+                    // Construir grafo se necessário
+                    if (grafoAdjacencias == null) {
+                        grafoAdjacencias = new GrafoAdjacencias(propriedades);
                     }
+                    
+                    // Converter grafo para Map<Integer, Set<Integer>>
+                    Map<Integer, Set<Integer>> grafoMap = buildGrafoMap();
+                    
+                    double mediaCorrigida = AreaAvancada.calcularAreaMediaCorrigida(
+                        propriedades, tipo, nome, grafoMap
+                    );
                     
                     Platform.runLater(() -> {
                         showProgress(false, null);
-                        mostrarEstatisticasAvancadas(stats);
+                        showAlert("Resultado Avançado", 
+                            String.format("Área Média Corrigida (Avançada)\n" +
+                                        "%s = %s\n\n" +
+                                        "%.2f m²\n\n" +
+                                        "ℹ️ Cálculo considera propriedades adjacentes\n" +
+                                        "do mesmo dono como um único grupo.",
+                                tipo, nome, mediaCorrigida));
                     });
                 } else {
-                    // CÁLCULO SIMPLES - Apenas média
+                    // CÁLCULO SIMPLES - Apenas média aritmética
                     double media = AreaPropriedades.calcularAreaMediaPorNivel(propriedades, tipo, nome);
                     
                     Platform.runLater(() -> {
@@ -347,36 +354,10 @@ public class GestaoTerritorioApp extends Application {
                 Platform.runLater(() -> {
                     showProgress(false, null);
                     showAlert("Erro", "Falha ao calcular: " + ex.getMessage());
+                    ex.printStackTrace();
                 });
             }
         }).start();
-    }
-
-    /**
-     * Mostra estatísticas avançadas em janela formatada
-     */
-    private void mostrarEstatisticasAvancadas(AreaAvancada.EstatisticasArea stats) {
-        Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("Estatísticas Avançadas");
-        dialog.setHeaderText("Análise Detalhada de Área");
-
-        VBox conteudo = new VBox(10);
-        conteudo.setPadding(new Insets(20));
-        conteudo.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 12px;");
-
-        Label textoStats = new Label(stats.toString());
-        textoStats.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 12px;");
-        textoStats.setWrapText(true);
-
-        conteudo.getChildren().add(textoStats);
-
-        ScrollPane scroll = new ScrollPane(conteudo);
-        scroll.setFitToWidth(true);
-        scroll.setPrefSize(500, 400);
-
-        dialog.getDialogPane().setContent(scroll);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
-        dialog.showAndWait();
     }
 
     private void gerarSugestoes(boolean avancada) {

@@ -42,8 +42,7 @@
         
         <!-- Excluir APENAS UI JavaFX do coverage (difícil de testar) -->
         <sonar.coverage.exclusions>
-            **/GestaoTerritorioApp.java,
-            **/TestarExportadores.java
+            **/GestaoTerritorioApp.java
         </sonar.coverage.exclusions>
     </properties>
 
@@ -128,10 +127,9 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
                 <configuration>
-                    <!-- Excluir UI JavaFX do JaCoCo também -->
+                    <!-- Excluir APENAS UI JavaFX do JaCoCo -->
                     <excludes>
                         <exclude>**/GestaoTerritorioApp.class</exclude>
-                        <exclude>**/TestarExportadores.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>
