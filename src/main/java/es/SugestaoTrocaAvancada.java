@@ -1,6 +1,10 @@
 package es;
 
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Responsável por gerar sugestões de troca avançadas entre propriedades rústicas,
@@ -33,16 +37,16 @@ public class SugestaoTrocaAvancada {
         // Iterar sobre pares de propriedades para avaliar trocas
         for (int i = 0; i < propriedades.size(); i++) {
             Propriedade p1 = propriedades.get(i);
-            if (!p1.getOwner().equals(donoAlvo)) continue;
+            if (!p1.getOwner().equals(donoAlvo)){continue;}
 
             for (int j = 0; j < propriedades.size(); j++) {
                 Propriedade p2 = propriedades.get(j);
-                if (p1.getOwner().equals(p2.getOwner())) continue;
+                if (p1.getOwner().equals(p2.getOwner())) {continue;}
 
                 // 1. Similaridade de área
                 double diffArea = Math.abs(p1.getShapeArea() - p2.getShapeArea()) /
                         Math.max(p1.getShapeArea(), p2.getShapeArea());
-                if (diffArea > 0.4) continue;
+                if (diffArea > 0.4) {continue;}
                 double scoreArea = 1 - diffArea;
 
                 // 2. Similaridade de perímetro

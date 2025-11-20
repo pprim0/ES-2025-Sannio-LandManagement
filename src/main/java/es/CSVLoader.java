@@ -1,25 +1,17 @@
 package es;
 
-import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Classe utilitária responsável por carregar dados de propriedades a partir de ficheiros CSV.
  */
 public class CSVLoader {
-
-    private static final String FICHEIRO_DEFAULT = "Madeira-Moodle-1.1.csv";
-
-    /**
-     * Carrega propriedades do ficheiro CSV padrão (Madeira-Moodle-1.1.csv).
-     *
-     * @return Lista de objetos Propriedade carregados com sucesso
-     */
-    public static List<Propriedade> carregar() {
-        return carregarPropriedades(FICHEIRO_DEFAULT);
-    }
 
     /**
      * Carrega uma lista de objetos {@link Propriedade} a partir de um ficheiro CSV com delimitador ';'.
@@ -38,7 +30,7 @@ public class CSVLoader {
         try (InputStream inputStream = CSVLoader.class.getClassLoader().getResourceAsStream(nomeFicheiro)) {
 
             if (inputStream == null) {
-                System.err.println("[ERRO] Ficheiro '" + nomeFicheiro + "' nao encontrado no classpath.");
+                System.err.println("[ERRO] Ficheiro '" + nomeFicheiro + "' não encontrado no classpath.");
                 return propriedades;
             }
 
@@ -71,7 +63,7 @@ public class CSVLoader {
 
                         propriedades.add(prop);
                     } catch (Exception e) {
-                        System.out.println("[AVISO] Linha invalida ignorada: " + linha.substring(0, Math.min(50, linha.length())));
+                        System.out.println("[ERRO] Linha inválida: " + linha);
                     }
                 }
             }
@@ -80,7 +72,6 @@ public class CSVLoader {
             System.out.println("[ERRO] Erro ao ler o ficheiro: " + e.getMessage());
         }
 
-        System.out.println("[INFO] Carregadas " + propriedades.size() + " propriedades de " + nomeFicheiro);
         return propriedades;
     }
 }

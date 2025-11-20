@@ -3,8 +3,16 @@ package es;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,7 +20,11 @@ import javafx.geometry.Pos;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -301,7 +313,7 @@ public class GestaoTerritorioApp extends Application {
         }
 
         String tipo = escolherOpcao("Tipo de divisão:", Arrays.asList("freguesia", "municipio", "ilha"));
-        if (tipo == null) return;
+        if (tipo == null) {return;}
 
         List<String> nomes = obterNomesPorTipo(tipo);
         if (nomes.isEmpty()) {
@@ -310,7 +322,7 @@ public class GestaoTerritorioApp extends Application {
         }
 
         String nome = escolherOpcao("Escolha " + tipo + ":", nomes);
-        if (nome == null) return;
+        if (nome == null) {return;}
 
         showProgress(true, avancada ? "Calculando área corrigida (componentes conexas)..." : "Calculando área média...");
         new Thread(() -> {
@@ -373,7 +385,7 @@ public class GestaoTerritorioApp extends Application {
             .collect(Collectors.toList());
 
         String dono = escolherOpcao("Escolha um proprietário:", donos);
-        if (dono == null) return;
+        if (dono == null) {return;}
 
         showProgress(true, "Gerando sugestões...");
         new Thread(() -> {
@@ -486,7 +498,7 @@ public class GestaoTerritorioApp extends Application {
     }
 
     private String escolherOpcao(String titulo, List<String> opcoes) {
-        if (opcoes.isEmpty()) return null;
+        if (opcoes.isEmpty()) {return null;}
         ChoiceDialog<String> dialog = new ChoiceDialog<>(opcoes.get(0), opcoes);
         dialog.setTitle("Escolha");
         dialog.setHeaderText(null);

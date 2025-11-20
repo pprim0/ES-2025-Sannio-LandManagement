@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class JSONExporter {
 
-    private static final Gson gson = new GsonBuilder()
+    private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
             .create();
 
@@ -29,7 +29,7 @@ public class JSONExporter {
     public static void exportarPropriedades(List<Propriedade> propriedades, String filename) 
             throws IOException {
         try (FileWriter writer = new FileWriter(filename)) {
-            gson.toJson(propriedades, writer);
+            GSON.toJson(propriedades, writer);
         }
     }
 
@@ -40,7 +40,7 @@ public class JSONExporter {
      * @return String JSON representando as propriedades
      */
     public static String propriedadesToJson(List<Propriedade> propriedades) {
-        return gson.toJson(propriedades);
+        return GSON.toJson(propriedades);
     }
 
     /**
@@ -65,10 +65,10 @@ public class JSONExporter {
         jsonObject.addProperty("area_total", areaTotal);
         
         // Adicionar dados por região
-        jsonObject.add("areas_por_regiao", gson.toJsonTree(areasPorRegiao));
+        jsonObject.add("areas_por_regiao", GSON.toJsonTree(areasPorRegiao));
         
         try (FileWriter writer = new FileWriter(filename)) {
-            gson.toJson(jsonObject, writer);
+            GSON.toJson(jsonObject, writer);
         }
     }
 
@@ -88,9 +88,9 @@ public class JSONExporter {
                 .mapToDouble(Double::doubleValue)
                 .sum();
         jsonObject.addProperty("area_total", areaTotal);
-        jsonObject.add("areas_por_regiao", gson.toJsonTree(areasPorRegiao));
+        jsonObject.add("areas_por_regiao", GSON.toJsonTree(areasPorRegiao));
         
-        return gson.toJson(jsonObject);
+        return GSON.toJson(jsonObject);
     }
 
     /**
@@ -115,7 +115,7 @@ public class JSONExporter {
         }
         
         try (FileWriter writer = new FileWriter(filename)) {
-            gson.toJson(jsonObject, writer);
+            GSON.toJson(jsonObject, writer);
         }
     }
 
@@ -137,7 +137,7 @@ public class JSONExporter {
             jsonObject.addProperty("grau_medio", 0.0);
         }
         
-        return gson.toJson(jsonObject);
+        return GSON.toJson(jsonObject);
     }
 
     /**
@@ -164,7 +164,7 @@ public class JSONExporter {
         analiseAreas.addProperty("total_ilhas", areasPorIlha.size());
         double areaTotal = areasPorIlha.values().stream().mapToDouble(Double::doubleValue).sum();
         analiseAreas.addProperty("area_total", areaTotal);
-        analiseAreas.add("areas_por_ilha", gson.toJsonTree(areasPorIlha));
+        analiseAreas.add("areas_por_ilha", GSON.toJsonTree(areasPorIlha));
         relatorio.add("analise_areas", analiseAreas);
         
         // Estatísticas do grafo
@@ -178,7 +178,7 @@ public class JSONExporter {
         relatorio.add("estatisticas_grafo", estatisticasGrafo);
         
         try (FileWriter writer = new FileWriter(filename)) {
-            gson.toJson(relatorio, writer);
+            GSON.toJson(relatorio, writer);
         }
     }
 }

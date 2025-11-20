@@ -1,6 +1,12 @@
 package es;
 
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 /**
  * Classe utilitária que fornece métodos para o cálculo de métricas relacionadas
@@ -61,7 +67,7 @@ public class AreaAvancada {
 
                     while (!stack.isEmpty()) {
                         int atualId = stack.pop();
-                        if (!visitados.add(atualId)) continue;
+                        if (!visitados.add(atualId)) {continue;}
 
                         // Obter a propriedade atual pelo ID
                         Propriedade atual = props.stream()
@@ -75,7 +81,7 @@ public class AreaAvancada {
                             for (int vizinhoId : grafoAdjacencia.getOrDefault(atualId, Set.of())) {
                                 boolean vizinhoEhDoMesmo = props.stream()
                                         .anyMatch(x -> x.getObjectId() == vizinhoId);
-                                if (vizinhoEhDoMesmo) stack.push(vizinhoId);
+                                if (vizinhoEhDoMesmo) {stack.push(vizinhoId);}
                             }
                         }
                     }

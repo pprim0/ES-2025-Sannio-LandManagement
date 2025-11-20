@@ -8,7 +8,13 @@ import org.locationtech.jts.io.WKTReader;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Classe responsável por exportar visualmente um grafo de adjacências entre
@@ -101,13 +107,11 @@ public class ExportadorAdjacenciasHTML {
 
     // Criar nós com base no centróide das geometrias
     for (Propriedade prop : propriedades) {
-      if (contador >= limite)
-        break;
+      if (contador >= limite){break;}
 
       try {
         Geometry geom = reader.read(prop.getGeometry());
-        if (!geom.isValid())
-          continue;
+        if (!geom.isValid()){continue;}
 
         Point centroide = geom.getCentroid();
         double x = centroide.getX();
@@ -132,8 +136,7 @@ public class ExportadorAdjacenciasHTML {
 
     // Adicionar arestas entre propriedades adjacentes
     for (Integer origem : grafo.keySet()) {
-      if (!adicionados.contains(origem))
-        continue;
+      if (!adicionados.contains(origem)){continue;}
       for (Integer destino : grafo.get(origem)) {
         if (adicionados.contains(destino)) {
           arestas.add(new Aresta(origem, destino));

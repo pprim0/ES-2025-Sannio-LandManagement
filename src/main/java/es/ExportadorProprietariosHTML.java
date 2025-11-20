@@ -5,7 +5,11 @@ import com.google.gson.GsonBuilder;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Classe responsável por exportar um grafo de conexões entre proprietários para
@@ -97,7 +101,7 @@ public class ExportadorProprietariosHTML {
         // Criar arestas entre os proprietários conectados (evitando duplicadas)
         for (Map.Entry<String, Set<String>> entry : grafoProprietarios.entrySet()) {
             Integer origemId = donoToId.get(entry.getKey());
-            if (origemId == null) continue;
+            if (origemId == null) {continue;}
             for (String vizinho : entry.getValue()) {
                 Integer destinoId = donoToId.get(vizinho);
                 if (destinoId != null && origemId < destinoId) {

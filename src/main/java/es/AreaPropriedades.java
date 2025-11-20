@@ -1,6 +1,10 @@
 package es;
 
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * Classe utilitária que fornece métodos para calcular áreas de propriedades

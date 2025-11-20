@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+  "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+  "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+    Checkstyle configuration customizado para o projeto
+    Baseado em Sun Checks mas com regras relaxadas
+-->
+
+<module name="Checker">
+    <!-- Configurações gerais -->
+    <property name="charset" value="UTF-8"/>
+    <property name="severity" value="warning"/>
+    <property name="fileExtensions" value="java"/>
+
+    <!-- ===================================================== -->
+    <!-- REGRAS QUE MANTEMOS (importantes) -->
+    <!-- ===================================================== -->
+    
+    <!-- Tamanho de ficheiros -->
+    <module name="FileLength">
+        <property name="max" value="2000"/>
+    </module>
+    
+    <!-- Sem tabs -->
+    <module name="FileTabCharacter"/>
+
+    <module name="TreeWalker">
+        <!-- Imports -->
+        <module name="AvoidStarImport"/>
+        <module name="RedundantImport"/>
+        <module name="UnusedImports"/>
+        
+        <!-- Naming Conventions (importantes) -->
+        <module name="ConstantName"/>
+        <module name="LocalFinalVariableName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="MethodName"/>
+        <module name="PackageName"/>
+        <module name="ParameterName"/>
+        <module name="StaticVariableName"/>
+        <module name="TypeName"/>
+        
+        <!-- Checks importantes de código -->
+        <module name="EmptyBlock"/>
+        <module name="NeedBraces"/>
+        <module name="AvoidNestedBlocks"/>
+        <module name="EmptyCatchBlock">
+            <property name="exceptionVariableName" value="expected|ignore"/>
+        </module>
+        
+        <!-- Complexidade -->
+        <module name="CyclomaticComplexity">
+            <property name="max" value="20"/>
+        </module>
+        
+        <!-- Misc -->
+        <module name="ArrayTypeStyle"/>
+        <module name="UpperEll"/>
+        
+        <!-- ===================================================== -->
+        <!-- REGRAS QUE DESATIVAMOS (muito chatas!) -->
+        <!-- ===================================================== -->
+        
+        <!-- ❌ SEM limite de 80 caracteres -->
+        <!-- <module name="LineLength"/> -->
+        
+        <!-- ❌ SEM final em parâmetros -->
+        <!-- <module name="FinalParameters"/> -->
+        
+        <!-- ❌ SEM JavaDoc obrigatório -->
+        <!-- <module name="JavadocMethod"/> -->
+        <!-- <module name="JavadocType"/> -->
+        <!-- <module name="JavadocVariable"/> -->
+        <!-- <module name="MissingJavadocMethod"/> -->
+        
+        <!-- ❌ SEM trailing spaces (IDE resolve) -->
+        <!-- <module name="RegexpSinglelineJava"/> -->
+        
+        <!-- ❌ SEM magic numbers (muitos falsos positivos) -->
+        <!-- <module name="MagicNumber"/> -->
+        
+        <!-- ❌ SEM utility class constructor -->
+        <!-- <module name="HideUtilityClassConstructor"/> -->
+        
+        <!-- ❌ SEM design for extension -->
+        <!-- <module name="DesignForExtension"/> -->
+        
+        <!-- ❌ SEM visibility modifier -->
+        <!-- <module name="VisibilityModifier"/> -->
+        
+        <!-- ❌ SEM hidden field -->
+        <!-- <module name="HiddenField"/> -->
+        
+        <!-- ❌ SEM newline at end of file -->
+        <!-- (Configurado no Checker, não no TreeWalker) -->
+    </module>
+    
+    <!-- ❌ Desativar newline at end of file -->
+    <!-- <module name="NewlineAtEndOfFile"/> -->
+</module>

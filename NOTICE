@@ -1,0 +1,16 @@
+Land Management System
+Copyright 2025 Primo - University of Sannio
+
+This product includes software developed at:
+- University of Sannio, Benevento, Italy
+- Professor: Massimiliano Di Penta
+
+Third-party dependencies and their licenses:
+See target/generated-sources/license/THIRD-PARTY.txt for complete list
+
+Main dependencies:
+- JGraphT (LGPL 2.1 / EPL 2.0)
+- JavaFX (GPL with Classpath Exception)
+- JUnit 5 (Eclipse Public License 2.0)
+- Apache Commons CSV (Apache License 2.0)
+- GSON (Apache License 2.0)

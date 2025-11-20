@@ -79,9 +79,6 @@
         <sonar.coverage.exclusions>
             **/GestaoTerritorioApp.java
         </sonar.coverage.exclusions>
-        
-        <!-- 🔧 DESATIVAR CHECKSTYLE TEMPORARIAMENTE -->
-        <checkstyle.skip>true</checkstyle.skip>
     </properties>
 
     <dependencies>
@@ -253,18 +250,28 @@
             </plugin>
 
             <!-- ================================================================ -->
-            <!-- 🟡 CHECKSTYLE - DESATIVADO TEMPORARIAMENTE -->
-            <!-- Para ativar depois: remover <skip>true</skip> -->
+            <!-- ✅ CHECKSTYLE - CUSTOM CONFIGURATION (RELAXADO) -->
             <!-- ================================================================ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>${checkstyle.version}</version>
                 <configuration>
-                    <skip>true</skip> <!-- ⚠️ DESATIVADO TEMPORARIAMENTE -->
-                    <configLocation>google_checks.xml</configLocation>
+                    <!-- ✅ Usar ficheiro checkstyle.xml na raiz do projeto -->
+                    <configLocation>checkstyle.xml</configLocation>
                     <failsOnError>false</failsOnError>
+                    <consoleOutput>true</consoleOutput>
+                    <violationSeverity>warning</violationSeverity>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>checkstyle-validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- JavaFX Maven Plugin -->

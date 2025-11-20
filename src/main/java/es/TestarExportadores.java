@@ -2,9 +2,13 @@ package es;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.awt.Desktop;
-import java.io.File;
+
 
 /**
  * Classe principal para testar os exportadores HTML.
@@ -25,8 +29,8 @@ public class TestarExportadores {
         }
 
         // LIMITAR para teste rápido (senão demora MUITO com 35k propriedades!)
-        int limite_props = Math.min(500, todasProps.size());
-        List<Propriedade> propriedades = todasProps.subList(0, limite_props);
+        int limiteProps = Math.min(500, todasProps.size());
+        List<Propriedade> propriedades = todasProps.subList(0, limiteProps);
 
         System.out.println("   Total no CSV: " + todasProps.size() + " propriedades");
         System.out.println("   Usando: " + propriedades.size() + " propriedades para teste rapido\n");

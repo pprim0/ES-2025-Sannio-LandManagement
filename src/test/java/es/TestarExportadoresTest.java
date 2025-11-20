@@ -3,14 +3,13 @@ package es;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.regex.Pattern;  // ← ADICIONAR ESTE IMPORT
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 

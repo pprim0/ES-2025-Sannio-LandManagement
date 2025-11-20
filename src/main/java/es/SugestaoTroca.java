@@ -1,6 +1,11 @@
 package es;
 
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Representa uma sugestão de troca entre duas propriedades de diferentes proprietários,
@@ -105,16 +110,16 @@ public class SugestaoTroca {
 
         for (int i = 0; i < propriedades.size(); i++) {
             Propriedade p1 = propriedades.get(i);
-            if (!p1.getOwner().equals(donoAlvo)) continue;
+            if (!p1.getOwner().equals(donoAlvo)) {continue;}
 
             for (int j = i + 1; j < propriedades.size(); j++) {
                 Propriedade p2 = propriedades.get(j);
-                if (p1.getOwner().equals(p2.getOwner())) continue;
+                if (p1.getOwner().equals(p2.getOwner())) {continue;}
 
                 double diffArea = Math.abs(p1.getShapeArea() - p2.getShapeArea()) /
                         Math.max(p1.getShapeArea(), p2.getShapeArea());
 
-                if (diffArea > 0.3) continue;
+                if (diffArea > 0.3) {continue;}
 
                 double scoreArea = 1 - diffArea;
                 double scoreFinal = scoreArea;
