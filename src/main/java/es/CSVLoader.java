@@ -104,7 +104,9 @@ public class CSVLoader {
      * Auxiliar para converter strings numéricas substituindo vírgulas por pontos.
      */
     private static double parseDouble(String value) {
-        if (value == null || value.isEmpty()) return 0.0;
+        if (value == null || value.isEmpty()) {
+            return 0.0;
+        }
         return Double.parseDouble(value.replace(",", "."));
     }
 }
