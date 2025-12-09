@@ -72,7 +72,8 @@
         </sonar.coverage.jacoco.xmlReportPaths>
         
         <sonar.coverage.exclusions>
-            **/GestaoTerritorioApp.java
+             **/GestaoTerritorioApp.java,
+            **/TestarExportadores.java
         </sonar.coverage.exclusions>
     </properties>
 
