@@ -28,13 +28,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Aplicação JavaFX para a gestão visual de propriedades rústicas.
- * Permite carregar dados de propriedades, construir grafos de adjacência,
- * calcular áreas médias e gerar sugestões de troca entre proprietários.
+ * JavaFX Application for visual management of rural properties.
+ * Allows loading property data, building adjacency graphs,
+ * calculating average areas and generating exchange suggestions between owners.
  * 
- * VERSÃO MELHORADA:
- * - Botões de grafo agora exportam e visualizam automaticamente
- * - Área avançada implementada com estatísticas detalhadas
+ * FULL VERSION:
+ * - Visualization of ALL 35k properties
+ * - Advanced area calculation with detailed statistics
  */
 public class GestaoTerritorioApp extends Application {
 
@@ -52,61 +52,56 @@ public class GestaoTerritorioApp extends Application {
         root.setStyle("-fx-background-color: linear-gradient(to bottom right, #667eea, #764ba2);");
 
         // Header
-        Label titleLabel = new Label("🗺️ Sistema de Gestão Territorial");
+        Label titleLabel = new Label("🗺️ Land Management System");
         titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;");
 
-        statusLabel = new Label("Carregando propriedades...");
+        statusLabel = new Label("Loading properties...");
         statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: white; -fx-padding: 10px;");
 
         progressIndicator = new ProgressIndicator();
         progressIndicator.setVisible(false);
         progressIndicator.setMaxSize(50, 50);
 
-        // Carregar propriedades
+        // Load properties
         new Thread(() -> {
             try {
                 propriedades = CSVLoader.carregarPropriedades("data/Madeira-Moodle-1.1.csv");
                 Platform.runLater(() -> {
-                    statusLabel.setText("✅ " + propriedades.size() + " propriedades carregadas");
+                    statusLabel.setText("✅ " + propriedades.size() + " properties loaded");
                     statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #90EE90; -fx-font-weight: bold;");
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    statusLabel.setText("❌ Erro ao carregar propriedades: " + e.getMessage());
+                    statusLabel.setText("❌ Error loading properties: " + e.getMessage());
                     statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #FF6B6B; -fx-font-weight: bold;");
                 });
             }
         }).start();
 
-        // Botões
+        // Buttons
         VBox buttonBox = new VBox(10);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setMaxWidth(400);
 
-        Button btnVisualizacao = createStyledButton("📊 Abrir Visualização Web", "#4CAF50");
-        btnVisualizacao.setOnAction(e -> abrirVisualizacao());
-
-        Button btnGrafoAdj = createStyledButton("🔗 Construir Grafo de Adjacências", "#2196F3");
+        Button btnGrafoAdj = createStyledButton("🔗 Build Adjacency Graph (ALL)", "#2196F3");
         btnGrafoAdj.setOnAction(e -> construirGrafoAdjacencias());
 
-        Button btnGrafoProp = createStyledButton("👥 Construir Grafo de Proprietários", "#FF9800");
+        Button btnGrafoProp = createStyledButton("👥 Build Owner Graph", "#FF9800");
         btnGrafoProp.setOnAction(e -> construirGrafoProprietarios());
 
-        Button btnAreaSimples = createStyledButton("📐 Calcular Área Média (Simples)", "#9C27B0");
+        Button btnAreaSimples = createStyledButton("📐 Calculate Average Area (Simple)", "#9C27B0");
         btnAreaSimples.setOnAction(e -> calcularAreaMedia(false));
 
-        Button btnAreaAvancada = createStyledButton("📏 Calcular Área Média (Avançada)", "#E91E63");
+        Button btnAreaAvancada = createStyledButton("📏 Calculate Average Area (Advanced)", "#E91E63");
         btnAreaAvancada.setOnAction(e -> calcularAreaMedia(true));
 
-        Button btnSugestoesSimples = createStyledButton("💡 Sugestões de Troca (Simples)", "#00BCD4");
+        Button btnSugestoesSimples = createStyledButton("💡 Exchange Suggestions (Simple)", "#00BCD4");
         btnSugestoesSimples.setOnAction(e -> gerarSugestoes(false));
 
-        Button btnSugestoesAvancadas = createStyledButton("⭐ Sugestões de Troca (Avançadas)", "#FFC107");
+        Button btnSugestoesAvancadas = createStyledButton("⭐ Exchange Suggestions (Advanced)", "#FFC107");
         btnSugestoesAvancadas.setOnAction(e -> gerarSugestoes(true));
 
         buttonBox.getChildren().addAll(
-            btnVisualizacao,
-            new Separator(),
             btnGrafoAdj,
             btnGrafoProp,
             new Separator(),
@@ -120,7 +115,7 @@ public class GestaoTerritorioApp extends Application {
         root.getChildren().addAll(titleLabel, statusLabel, progressIndicator, buttonBox);
 
         Scene scene = new Scene(root, 900, 700);
-        stage.setTitle("Sistema de Gestão Territorial - Grupo");
+        stage.setTitle("Land Management System - Group Project");
         stage.setScene(scene);
         stage.show();
     }
@@ -143,132 +138,120 @@ public class GestaoTerritorioApp extends Application {
         return btn;
     }
 
-    private void abrirVisualizacao() {
-        if (propriedades == null || propriedades.isEmpty()) {
-            showAlert("Aviso", "Aguarde o carregamento das propriedades!");
-            return;
-        }
-
-        showProgress(true, "Gerando visualização...");
-        new Thread(() -> {
-            try {
-                // Se ainda não existe, constrói os grafos
-                if (grafoAdjacencias == null) {
-                    grafoAdjacencias = new GrafoAdjacencias(propriedades);
-                }
-                if (grafoProprietarios == null) {
-                    grafoProprietarios = new GrafoProprietarios(grafoAdjacencias);
-                }
-
-                // Exporta HTML
-                Map<Integer, Set<Integer>> grafoMap = buildGrafoMap();
-                
-                ExportadorAdjacenciasHTML.exportar(
-                    propriedades.subList(0, Math.min(100, propriedades.size())),
-                    grafoMap,
-                    "grafo_adjacencias.html",
-                    "adjacencias.js",
-                    100
-                );
-
-                ExportadorProprietariosHTML.exportar(
-                    grafoProprietarios.getGrafoCompleto(),
-                    "./",
-                    "grafo_proprietarios.html",
-                    "proprietarios.js"
-                );
-
-                // Cria index.html
-                TestarExportadores.criarIndexHTML();
-
-                Platform.runLater(() -> {
-                    showProgress(false, null);
-                    abrirHTML("index.html");
-                });
-            } catch (Exception ex) {
-                Platform.runLater(() -> {
-                    showProgress(false, null);
-                    showAlert("Erro", "Falha ao gerar visualização: " + ex.getMessage());
-                });
-            }
-        }).start();
-    }
-
     /**
-     * MELHORADO: Agora constrói o grafo E exporta para HTML automaticamente
+     * ⚠️ FULL VERSION: Exports ALL 35k properties
+     * WARNING: May take 1-2 minutes and consume high RAM in browser!
      */
     private void construirGrafoAdjacencias() {
         if (propriedades == null || propriedades.isEmpty()) {
-            showAlert("Aviso", "Aguarde o carregamento das propriedades!");
+            showAlert("Warning", "Please wait for properties to load!");
             return;
         }
 
-        showProgress(true, "Construindo e exportando grafo de adjacências...");
+        // ⚠️ USER WARNING
+        Alert warning = new Alert(Alert.AlertType.WARNING);
+        warning.setTitle("⚠️ IMPORTANT WARNING");
+        warning.setHeaderText("Visualization of ALL properties");
+        warning.setContentText(
+            "You are about to visualize " + propriedades.size() + " properties!\n\n" +
+            "⚠️ THIS MAY:\n" +
+            "• Take 1-2 minutes to process\n" +
+            "• Consume 4-8 GB of RAM in browser\n" +
+            "• Make the browser slow or freeze\n" +
+            "• Result in very dense visualization\n\n" +
+            "💡 RECOMMENDATION:\n" +
+            "For better experience, consider using a smaller sample.\n\n" +
+            "Continue anyway?"
+        );
+        warning.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+        
+        if (warning.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
+            return;
+        }
+
+        showProgress(true, "⏳ Building graph with " + propriedades.size() + " properties... (may take time)");
         new Thread(() -> {
             try {
-                // Construir grafo
+                long startTime = System.currentTimeMillis();
+                
+                // Build graph
                 grafoAdjacencias = new GrafoAdjacencias(propriedades);
                 
-                // Exportar para HTML
+                Platform.runLater(() -> {
+                    statusLabel.setText("✅ Graph built! Exporting HTML...");
+                });
+                
+                // Export to HTML with ALL properties
                 Map<Integer, Set<Integer>> grafoMap = buildGrafoMap();
+                
                 ExportadorAdjacenciasHTML.exportar(
-                    propriedades.subList(0, Math.min(100, propriedades.size())),
+                    propriedades, // ✅ ALL properties
                     grafoMap,
                     "grafo_adjacencias.html",
                     "adjacencias.js",
-                    100
+                    propriedades.size() // ✅ No limit
                 );
+                
+                long endTime = System.currentTimeMillis();
+                long duration = (endTime - startTime) / 1000;
                 
                 Platform.runLater(() -> {
                     showProgress(false, null);
                     
-                    // Mostrar estatísticas E abrir visualização
+                    // Show statistics
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Grafo Construído");
-                    alert.setHeaderText("Grafo de Adjacências construído com sucesso!");
+                    alert.setTitle("✅ Graph Built");
+                    alert.setHeaderText("Adjacency Graph generated successfully!");
                     alert.setContentText(String.format(
-                        "Vértices (Propriedades): %d\n" +
-                        "Arestas (Adjacências): %d\n\n" +
-                        "Visualização será aberta no browser...",
-                        grafoAdjacencias.getNumVertices(),
-                        grafoAdjacencias.getNumArestas()
+                        "📊 STATISTICS:\n\n" +
+                        "Properties visualized: %,d\n" +
+                        "Adjacencies (edges): %,d\n" +
+                        "Processing time: %d seconds\n\n" +
+                        "⚠️ ATTENTION:\n" +
+                        "Browser may take 30-60 seconds to render.\n" +
+                        "Please be patient!\n\n" +
+                        "Opening visualization...",
+                        propriedades.size(),
+                        grafoAdjacencias.getNumArestas(),
+                        duration
                     ));
                     
                     alert.showAndWait();
                     
-                    // Abrir no browser
+                    // Open in browser
                     abrirHTML("grafo_adjacencias.html");
                 });
             } catch (Exception ex) {
                 Platform.runLater(() -> {
                     showProgress(false, null);
-                    showAlert("Erro", "Falha ao construir grafo: " + ex.getMessage());
+                    showAlert("Error", "Failed to build graph: " + ex.getMessage());
+                    ex.printStackTrace();
                 });
             }
         }).start();
     }
 
     /**
-     * MELHORADO: Agora constrói o grafo E exporta para HTML automaticamente
+     * Build owner graph (this one stays normal)
      */
     private void construirGrafoProprietarios() {
         if (propriedades == null || propriedades.isEmpty()) {
-            showAlert("Aviso", "Aguarde o carregamento das propriedades!");
+            showAlert("Warning", "Please wait for properties to load!");
             return;
         }
 
-        showProgress(true, "Construindo e exportando grafo de proprietários...");
+        showProgress(true, "Building and exporting owner graph...");
         new Thread(() -> {
             try {
-                // Construir grafo de adjacências se necessário
+                // Build adjacency graph if needed
                 if (grafoAdjacencias == null) {
                     grafoAdjacencias = new GrafoAdjacencias(propriedades);
                 }
                 
-                // Construir grafo de proprietários
+                // Build owner graph
                 grafoProprietarios = new GrafoProprietarios(grafoAdjacencias);
                 
-                // Exportar para HTML
+                // Export to HTML
                 ExportadorProprietariosHTML.exportar(
                     grafoProprietarios.getGrafoCompleto(),
                     "./",
@@ -279,62 +262,66 @@ public class GestaoTerritorioApp extends Application {
                 Platform.runLater(() -> {
                     showProgress(false, null);
                     
-                    // Mostrar estatísticas E abrir visualização
+                    // Show statistics AND open visualization
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Grafo Construído");
-                    alert.setHeaderText("Grafo de Proprietários construído com sucesso!");
+                    alert.setTitle("Graph Built");
+                    alert.setHeaderText("Owner Graph built successfully!");
                     alert.setContentText(String.format(
-                        "Proprietários: %d\n\n" +
-                        "Visualização será aberta no browser...",
+                        "Owners: %d\n\n" +
+                        "Visualization will be opened in browser...",
                         grafoProprietarios.getNumProprietarios()
                     ));
                     
                     alert.showAndWait();
                     
-                    // Abrir no browser
+                    // Open in browser
                     abrirHTML("grafo_proprietarios.html");
                 });
             } catch (Exception ex) {
                 Platform.runLater(() -> {
                     showProgress(false, null);
-                    showAlert("Erro", "Falha ao construir grafo: " + ex.getMessage());
+                    showAlert("Error", "Failed to build graph: " + ex.getMessage());
                 });
             }
         }).start();
     }
 
     /**
-     * MELHORADO: Agora suporta cálculo avançado com componentes conexas
+     * Calculate average area (simple or advanced)
      */
     private void calcularAreaMedia(boolean avancada) {
         if (propriedades == null || propriedades.isEmpty()) {
-            showAlert("Aviso", "Aguarde o carregamento das propriedades!");
+            showAlert("Warning", "Please wait for properties to load!");
             return;
         }
 
-        String tipo = escolherOpcao("Tipo de divisão:", Arrays.asList("freguesia", "municipio", "ilha"));
-        if (tipo == null) {return;}
+        String tipo = escolherOpcao("Division type:", Arrays.asList("freguesia", "municipio", "ilha"));
+        if (tipo == null) {
+            return;
+        }
 
         List<String> nomes = obterNomesPorTipo(tipo);
         if (nomes.isEmpty()) {
-            showAlert("Erro", "Não foram encontrados nomes para o tipo selecionado.");
+            showAlert("Error", "No names found for the selected type.");
             return;
         }
 
-        String nome = escolherOpcao("Escolha " + tipo + ":", nomes);
-        if (nome == null) {return;}
+        String nome = escolherOpcao("Choose " + tipo + ":", nomes);
+        if (nome == null) {
+            return;
+        }
 
-        showProgress(true, avancada ? "Calculando área corrigida (componentes conexas)..." : "Calculando área média...");
+        showProgress(true, avancada ? "Calculating corrected area (connected components)..." : "Calculating average area...");
         new Thread(() -> {
             try {
                 if (avancada) {
-                    // CÁLCULO AVANÇADO - Considera componentes conexas (grupos adjacentes)
-                    // Construir grafo se necessário
+                    // ADVANCED CALCULATION - Considers connected components (adjacent groups)
+                    // Build graph if needed
                     if (grafoAdjacencias == null) {
                         grafoAdjacencias = new GrafoAdjacencias(propriedades);
                     }
                     
-                    // Converter grafo para Map<Integer, Set<Integer>>
+                    // Convert graph to Map<Integer, Set<Integer>>
                     Map<Integer, Set<Integer>> grafoMap = buildGrafoMap();
                     
                     double mediaCorrigida = AreaAvancada.calcularAreaMediaCorrigida(
@@ -343,29 +330,29 @@ public class GestaoTerritorioApp extends Application {
                     
                     Platform.runLater(() -> {
                         showProgress(false, null);
-                        showAlert("Resultado Avançado", 
-                            String.format("Área Média Corrigida (Avançada)\n" +
+                        showAlert("Advanced Result", 
+                            String.format("Corrected Average Area (Advanced)\n" +
                                         "%s = %s\n\n" +
                                         "%.2f m²\n\n" +
-                                        "ℹ️ Cálculo considera propriedades adjacentes\n" +
-                                        "do mesmo dono como um único grupo.",
+                                        "ℹ️ Calculation considers adjacent properties\n" +
+                                        "from the same owner as a single group.",
                                 tipo, nome, mediaCorrigida));
                     });
                 } else {
-                    // CÁLCULO SIMPLES - Apenas média aritmética
+                    // SIMPLE CALCULATION - Just arithmetic average
                     double media = AreaPropriedades.calcularAreaMediaPorNivel(propriedades, tipo, nome);
                     
                     Platform.runLater(() -> {
                         showProgress(false, null);
-                        showAlert("Resultado", 
-                            String.format("Área média (Simples)\n%s = %s\n\n%.2f m²",
+                        showAlert("Result", 
+                            String.format("Average area (Simple)\n%s = %s\n\n%.2f m²",
                                 tipo, nome, media));
                     });
                 }
             } catch (Exception ex) {
                 Platform.runLater(() -> {
                     showProgress(false, null);
-                    showAlert("Erro", "Falha ao calcular: " + ex.getMessage());
+                    showAlert("Error", "Failed to calculate: " + ex.getMessage());
                     ex.printStackTrace();
                 });
             }
@@ -374,7 +361,7 @@ public class GestaoTerritorioApp extends Application {
 
     private void gerarSugestoes(boolean avancada) {
         if (propriedades == null || propriedades.isEmpty()) {
-            showAlert("Aviso", "Aguarde o carregamento das propriedades!");
+            showAlert("Warning", "Please wait for properties to load!");
             return;
         }
 
@@ -384,10 +371,12 @@ public class GestaoTerritorioApp extends Application {
             .sorted()
             .collect(Collectors.toList());
 
-        String dono = escolherOpcao("Escolha um proprietário:", donos);
-        if (dono == null) {return;}
+        String dono = escolherOpcao("Choose an owner:", donos);
+        if (dono == null) {
+            return;
+        }
 
-        showProgress(true, "Gerando sugestões...");
+        showProgress(true, "Generating suggestions...");
         new Thread(() -> {
             try {
                 List<?> sugestoes = avancada
@@ -397,14 +386,14 @@ public class GestaoTerritorioApp extends Application {
                 Platform.runLater(() -> {
                     showProgress(false, null);
                     mostrarSugestoes(
-                        avancada ? "Sugestões Avançadas" : "Sugestões Simples",
+                        avancada ? "Advanced Suggestions" : "Simple Suggestions",
                         sugestoes
                     );
                 });
             } catch (Exception ex) {
                 Platform.runLater(() -> {
                     showProgress(false, null);
-                    showAlert("Erro", "Falha ao gerar sugestões: " + ex.getMessage());
+                    showAlert("Error", "Failed to generate suggestions: " + ex.getMessage());
                 });
             }
         }).start();
@@ -413,13 +402,13 @@ public class GestaoTerritorioApp extends Application {
     private void mostrarSugestoes(String titulo, List<?> sugestoes) {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle(titulo);
-        dialog.setHeaderText("Top 50 Sugestões (ordenadas por score)");
+        dialog.setHeaderText("Top 50 Suggestions (sorted by score)");
 
         VBox conteudo = new VBox(8);
         conteudo.setPadding(new Insets(15));
 
         if (sugestoes.isEmpty()) {
-            conteudo.getChildren().add(new Label("Nenhuma sugestão encontrada."));
+            conteudo.getChildren().add(new Label("No suggestions found."));
         } else {
             int limite = Math.min(50, sugestoes.size());
             for (int i = 0; i < limite; i++) {
@@ -474,10 +463,10 @@ public class GestaoTerritorioApp extends Application {
             if (htmlFile.exists()) {
                 Desktop.getDesktop().browse(htmlFile.toURI());
             } else {
-                showAlert("Erro", "Ficheiro não encontrado: " + path);
+                showAlert("Error", "File not found: " + path);
             }
         } catch (IOException e) {
-            showAlert("Erro", "Erro ao abrir HTML: " + e.getMessage());
+            showAlert("Error", "Error opening HTML: " + e.getMessage());
         }
     }
 
@@ -498,9 +487,11 @@ public class GestaoTerritorioApp extends Application {
     }
 
     private String escolherOpcao(String titulo, List<String> opcoes) {
-        if (opcoes.isEmpty()) {return null;}
+        if (opcoes.isEmpty()) {
+            return null;
+        }
         ChoiceDialog<String> dialog = new ChoiceDialog<>(opcoes.get(0), opcoes);
-        dialog.setTitle("Escolha");
+        dialog.setTitle("Choose");
         dialog.setHeaderText(null);
         dialog.setContentText(titulo);
         return dialog.showAndWait().orElse(null);
