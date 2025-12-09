@@ -27,16 +27,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+// ✅ Importar Logger (SLF4J)
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * JavaFX Application for visual management of rural properties.
  * Allows loading property data, building adjacency graphs,
  * calculating average areas and generating exchange suggestions between owners.
- * 
- * FULL VERSION:
+ * * FULL VERSION:
  * - Visualization of ALL 35k properties
  * - Advanced area calculation with detailed statistics
  */
 public class GestaoTerritorioApp extends Application {
+
+    // ✅ Inicializar Logger
+    private static final Logger LOGGER = LoggerFactory.getLogger(GestaoTerritorioApp.class);
 
     private List<Propriedade> propriedades;
     private GrafoAdjacencias grafoAdjacencias;
@@ -70,11 +76,13 @@ public class GestaoTerritorioApp extends Application {
                     statusLabel.setText("✅ " + propriedades.size() + " properties loaded");
                     statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #90EE90; -fx-font-weight: bold;");
                 });
+                LOGGER.info("{} properties loaded successfully.", propriedades.size());
             } catch (Exception e) {
                 Platform.runLater(() -> {
                     statusLabel.setText("❌ Error loading properties: " + e.getMessage());
                     statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #FF6B6B; -fx-font-weight: bold;");
                 });
+                LOGGER.error("Failed to load properties.", e);
             }
         }).start();
 
@@ -83,7 +91,8 @@ public class GestaoTerritorioApp extends Application {
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setMaxWidth(400);
 
-        Button btnGrafoAdj = createStyledButton("🔗 Build Adjacency Graph (ALL)", "#2196F3");
+        // ✅ MUDANÇA 1: Texto do botão simplificado (sem "ALL")
+        Button btnGrafoAdj = createStyledButton("🔗 Build Adjacency Graph", "#2196F3");
         btnGrafoAdj.setOnAction(e -> construirGrafoAdjacencias());
 
         Button btnGrafoProp = createStyledButton("👥 Build Owner Graph", "#FF9800");
@@ -139,8 +148,8 @@ public class GestaoTerritorioApp extends Application {
     }
 
     /**
-     * ⚠️ FULL VERSION: Exports ALL 35k properties
-     * WARNING: May take 1-2 minutes and consume high RAM in browser!
+     * Builds the adjacency graph and exports to HTML.
+     * ✅ MUDANÇA 2: Simplified version without scary warnings.
      */
     private void construirGrafoAdjacencias() {
         if (propriedades == null || propriedades.isEmpty()) {
@@ -148,28 +157,9 @@ public class GestaoTerritorioApp extends Application {
             return;
         }
 
-        // ⚠️ USER WARNING
-        Alert warning = new Alert(Alert.AlertType.WARNING);
-        warning.setTitle("⚠️ IMPORTANT WARNING");
-        warning.setHeaderText("Visualization of ALL properties");
-        warning.setContentText(
-            "You are about to visualize " + propriedades.size() + " properties!\n\n" +
-            "⚠️ THIS MAY:\n" +
-            "• Take 1-2 minutes to process\n" +
-            "• Consume 4-8 GB of RAM in browser\n" +
-            "• Make the browser slow or freeze\n" +
-            "• Result in very dense visualization\n\n" +
-            "💡 RECOMMENDATION:\n" +
-            "For better experience, consider using a smaller sample.\n\n" +
-            "Continue anyway?"
-        );
-        warning.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+        // ✅ Mensagem amigável
+        showProgress(true, "⏳ Building graph... Please wait a few seconds.");
         
-        if (warning.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
-            return;
-        }
-
-        showProgress(true, "⏳ Building graph with " + propriedades.size() + " properties... (may take time)");
         new Thread(() -> {
             try {
                 long startTime = System.currentTimeMillis();
@@ -181,15 +171,15 @@ public class GestaoTerritorioApp extends Application {
                     statusLabel.setText("✅ Graph built! Exporting HTML...");
                 });
                 
-                // Export to HTML with ALL properties
+                // Export to HTML
                 Map<Integer, Set<Integer>> grafoMap = buildGrafoMap();
                 
                 ExportadorAdjacenciasHTML.exportar(
-                    propriedades, // ✅ ALL properties
+                    propriedades, 
                     grafoMap,
                     "grafo_adjacencias.html",
                     "adjacencias.js",
-                    propriedades.size() // ✅ No limit
+                    propriedades.size() 
                 );
                 
                 long endTime = System.currentTimeMillis();
@@ -201,15 +191,11 @@ public class GestaoTerritorioApp extends Application {
                     // Show statistics
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("✅ Graph Built");
-                    alert.setHeaderText("Adjacency Graph generated successfully!");
+                    alert.setHeaderText("Graph generated successfully!");
                     alert.setContentText(String.format(
-                        "📊 STATISTICS:\n\n" +
-                        "Properties visualized: %,d\n" +
-                        "Adjacencies (edges): %,d\n" +
-                        "Processing time: %d seconds\n\n" +
-                        "⚠️ ATTENTION:\n" +
-                        "Browser may take 30-60 seconds to render.\n" +
-                        "Please be patient!\n\n" +
+                        "Nodes: %,d\n" +
+                        "Edges: %,d\n" +
+                        "Time: %d s\n\n" +
                         "Opening visualization...",
                         propriedades.size(),
                         grafoAdjacencias.getNumArestas(),
@@ -221,19 +207,19 @@ public class GestaoTerritorioApp extends Application {
                     // Open in browser
                     abrirHTML("grafo_adjacencias.html");
                 });
+                LOGGER.info("Adjacency graph built in {}s with {} nodes.", duration, propriedades.size());
+
             } catch (Exception ex) {
                 Platform.runLater(() -> {
                     showProgress(false, null);
                     showAlert("Error", "Failed to build graph: " + ex.getMessage());
-                    ex.printStackTrace();
                 });
+                // ✅ MUDANÇA 3: Log profissional
+                LOGGER.error("Error building adjacency graph.", ex);
             }
         }).start();
     }
 
-    /**
-     * Build owner graph (this one stays normal)
-     */
     private void construirGrafoProprietarios() {
         if (propriedades == null || propriedades.isEmpty()) {
             showAlert("Warning", "Please wait for properties to load!");
@@ -243,15 +229,12 @@ public class GestaoTerritorioApp extends Application {
         showProgress(true, "Building and exporting owner graph...");
         new Thread(() -> {
             try {
-                // Build adjacency graph if needed
                 if (grafoAdjacencias == null) {
                     grafoAdjacencias = new GrafoAdjacencias(propriedades);
                 }
                 
-                // Build owner graph
                 grafoProprietarios = new GrafoProprietarios(grafoAdjacencias);
                 
-                // Export to HTML
                 ExportadorProprietariosHTML.exportar(
                     grafoProprietarios.getGrafoCompleto(),
                     "./",
@@ -261,8 +244,6 @@ public class GestaoTerritorioApp extends Application {
                 
                 Platform.runLater(() -> {
                     showProgress(false, null);
-                    
-                    // Show statistics AND open visualization
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Graph Built");
                     alert.setHeaderText("Owner Graph built successfully!");
@@ -271,10 +252,7 @@ public class GestaoTerritorioApp extends Application {
                         "Visualization will be opened in browser...",
                         grafoProprietarios.getNumProprietarios()
                     ));
-                    
                     alert.showAndWait();
-                    
-                    // Open in browser
                     abrirHTML("grafo_proprietarios.html");
                 });
             } catch (Exception ex) {
@@ -282,13 +260,11 @@ public class GestaoTerritorioApp extends Application {
                     showProgress(false, null);
                     showAlert("Error", "Failed to build graph: " + ex.getMessage());
                 });
+                LOGGER.error("Error building owner graph.", ex);
             }
         }).start();
     }
 
-    /**
-     * Calculate average area (simple or advanced)
-     */
     private void calcularAreaMedia(boolean avancada) {
         if (propriedades == null || propriedades.isEmpty()) {
             showAlert("Warning", "Please wait for properties to load!");
@@ -315,13 +291,9 @@ public class GestaoTerritorioApp extends Application {
         new Thread(() -> {
             try {
                 if (avancada) {
-                    // ADVANCED CALCULATION - Considers connected components (adjacent groups)
-                    // Build graph if needed
                     if (grafoAdjacencias == null) {
                         grafoAdjacencias = new GrafoAdjacencias(propriedades);
                     }
-                    
-                    // Convert graph to Map<Integer, Set<Integer>>
                     Map<Integer, Set<Integer>> grafoMap = buildGrafoMap();
                     
                     double mediaCorrigida = AreaAvancada.calcularAreaMediaCorrigida(
@@ -331,30 +303,23 @@ public class GestaoTerritorioApp extends Application {
                     Platform.runLater(() -> {
                         showProgress(false, null);
                         showAlert("Advanced Result", 
-                            String.format("Corrected Average Area (Advanced)\n" +
-                                        "%s = %s\n\n" +
-                                        "%.2f m²\n\n" +
-                                        "ℹ️ Calculation considers adjacent properties\n" +
-                                        "from the same owner as a single group.",
-                                tipo, nome, mediaCorrigida));
+                            String.format("Corrected Average Area (Advanced)\n%s = %s\n\n%.2f m²", tipo, nome, mediaCorrigida));
                     });
                 } else {
-                    // SIMPLE CALCULATION - Just arithmetic average
                     double media = AreaPropriedades.calcularAreaMediaPorNivel(propriedades, tipo, nome);
                     
                     Platform.runLater(() -> {
                         showProgress(false, null);
                         showAlert("Result", 
-                            String.format("Average area (Simple)\n%s = %s\n\n%.2f m²",
-                                tipo, nome, media));
+                            String.format("Average area (Simple)\n%s = %s\n\n%.2f m²", tipo, nome, media));
                     });
                 }
             } catch (Exception ex) {
                 Platform.runLater(() -> {
                     showProgress(false, null);
                     showAlert("Error", "Failed to calculate: " + ex.getMessage());
-                    ex.printStackTrace();
                 });
+                LOGGER.error("Error calculating area.", ex);
             }
         }).start();
     }
@@ -395,6 +360,7 @@ public class GestaoTerritorioApp extends Application {
                     showProgress(false, null);
                     showAlert("Error", "Failed to generate suggestions: " + ex.getMessage());
                 });
+                LOGGER.error("Error generating suggestions.", ex);
             }
         }).start();
     }
@@ -467,6 +433,7 @@ public class GestaoTerritorioApp extends Application {
             }
         } catch (IOException e) {
             showAlert("Error", "Error opening HTML: " + e.getMessage());
+            LOGGER.error("Error opening file: " + path, e);
         }
     }
 
