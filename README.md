@@ -212,19 +212,17 @@ mvn clean test jacoco:report
 open target/site/jacoco/index.html
 ```
 
-### Test Coverage (Updated December 2024)
+### Test Coverage (Updated December 2025)
 
-| Metric | Value | Status | Industry Standard |
-|---------|-------|--------|-------------------|
-| **Total Tests** | 92 | ✅ All Passing | - |
-| **Test Suites** | 9 | ✅ | - |
-| **Instruction Coverage** | **95%** | ✅ **Excellent** | Google: 80%, Microsoft: 75% |
-| **Branch Coverage** | **82%** | ✅ **Excellent** | Target: >70% |
-| **Lines Covered** | 2,697 / 2,818 | ✅ | - |
-| **Methods Covered** | 93 / 101 | ✅ | - |
-| **Classes Covered** | 16 / 16 | ✅ 100% | - |
-
-**🏆 Coverage Achievement:** This project's **95% instruction coverage** places it in the **top 5% of industry standards**, surpassing major projects like Google (80%), Microsoft (75%), Netflix (80%), and Spring Framework (85%).
+| Metric | Value | Status |
+|---------|-------|--------|
+| **Total Tests** | 92 | ✅ All Passing |
+| **Test Suites** | 9 | ✅ |
+| **Instruction Coverage** | **95%** | ✅ **Excellent** |
+| **Branch Coverage** | **82%** | ✅ **Excellent** |
+| **Lines Covered** | 2,697 / 2,818 | ✅ |
+| **Methods Covered** | 93 / 101 | ✅ |
+| **Classes Covered** | 16 / 16 | ✅ 100% |
 
 ### Test Structure
 
@@ -257,24 +255,17 @@ es/
 
 The project maintains high quality standards through continuous analysis:
 
-| Metric | Status | Value | Target | Industry Benchmark |
-|--------|--------|-------|--------|-------------------|
-| **Quality Gate** | ✅ Passed | **Grade A** | A | - |
-| **Security** | ✅ Excellent | **0 vulnerabilities** | 0 | Critical |
-| **Reliability** | ✅ Excellent | **0 bugs** | 0 | Critical |
-| **Maintainability** | ✅ Excellent | **Rating A** | A | - |
-| **Coverage** | ✅ Outstanding | **95%** | >80% | 🏆 Top 5% |
-| **Duplications** | ✅ Excellent | **3.2%** | <5% | Target: <3% |
-| **Technical Debt** | ✅ Excellent | **8 hours** | <1 day | Target: <5% |
-| **Code Smells** | ⚠️ Good | **198** | <250 | Spring: 5000+ |
-| **Cognitive Complexity** | ✅ Good | **Low** | - | - |
-
-**🎯 Key Achievements:**
-- **Zero critical issues** (0 bugs, 0 vulnerabilities, 0 security hotspots)
-- **95% instruction coverage** - Exceeds Google (80%), Microsoft (75%), Netflix (80%)
-- **82% branch coverage** - Exceeds industry target of 70%
-- **Grade A maintainability** - Clean, well-structured code
-- **3.2% duplication** - Below 5% threshold
+| Metric | Status | Value | Target |
+|--------|--------|-------|--------|
+| **Quality Gate** | ✅ Passed | **Grade A** | A |
+| **Security** | ✅ Excellent | **0 vulnerabilities** | 0 |
+| **Reliability** | ✅ Excellent | **0 bugs** | 0 |
+| **Maintainability** | ✅ Excellent | **Rating A** | A |
+| **Coverage** | ✅ Outstanding | **95%** | >80% |
+| **Duplications** | ✅ Excellent | **3.2%** | <5% |
+| **Technical Debt** | ✅ Excellent | **8 hours** | <1 day |
+| **Code Smells** | ⚠️ Good | **198** | <250 |
+| **Cognitive Complexity** | ✅ Good | **Low** | - |
 
 [🔗 View complete analysis on SonarCloud](https://sonarcloud.io/summary/new_code?id=pprim0_ES-2025-Sannio-LandManagement)
 
@@ -451,8 +442,6 @@ mvn license:add-third-party
 - 📋 **Definition of Done:** Code complete, tests written, coverage >80%, reviewed, merged
 
 **Tracking & Traceability:**
-- 📝 Each commit references user story: `feat(US-01): implement CSV loader`
-- 🔗 Pull requests linked to GitHub issues
 - 📈 Burndown charts updated in Trello
 - ✅ Definition of Done verified for each story
 - 🏆 Velocity tracking: 25-30 story points per sprint
@@ -584,7 +573,7 @@ mvn clean install -DskipTests
 
 ## 🚀 Recent Professional Improvements
 
-### December 2024 Enhancements
+### December 2025 Enhancements
 
 #### 1. Apache Commons CSV Integration
 **Before:** Manual `String.split(";")` parsing (code smell)
@@ -654,7 +643,7 @@ logger.error("Failed to load properties", exception);
 **Pedro Primo**  
 Erasmus Student - Software Engineering  
 Università degli Studi del Sannio  
-Academic Year: 2024/2025  
+Academic Year: 2025/2026  
 Supervisor: Professor Massimiliano Di Penta
 
 ---
@@ -665,17 +654,7 @@ Supervisor: Professor Massimiliano Di Penta
 - 📊 [SonarCloud Dashboard](https://sonarcloud.io/summary/new_code?id=pprim0_ES-2025-Sannio-LandManagement)
 - ⚙️ [GitHub Actions CI/CD](https://github.com/pprim0/ES-2025-Sannio-LandManagement/actions)
 - 📋 [Trello Board](https://trello.com/b/uyY3kYgO/es-2025-land-management-system)
-- 📄 [Project Documentation](https://pprim0.github.io/ES-2025-Sannio-LandManagement/)
 - 📧 [Issues & Bug Reports](https://github.com/pprim0/ES-2025-Sannio-LandManagement/issues)
-
----
-
-## 📞 Contact
-
-For questions about the project:
-- **GitHub Issues:** [Create issue](https://github.com/pprim0/ES-2025-Sannio-LandManagement/issues)
-- **GitHub Discussions:** [Start discussion](https://github.com/pprim0/ES-2025-Sannio-LandManagement/discussions)
-- **Academic Email:** pedroprimo@estudante.unisannio.it
 
 ---
 
@@ -696,96 +675,14 @@ See [NOTICE](NOTICE) for complete and detailed attributions.
 
 ---
 
-## 🏆 Achievements
-
-### Software Engineering Best Practices
-
-✅ **Version Control:** Professional Git workflow with feature branches and PRs  
-✅ **CI/CD:** Automated pipeline with GitHub Actions (100% success rate)  
-✅ **Quality Assurance:** SonarCloud Grade A consistently maintained  
-✅ **Testing:** 92 unit tests with 95% instruction coverage (top 5% industry)  
-✅ **Documentation:** Complete JavaDoc + detailed README  
-✅ **License Management:** MIT License + automatic SBOM generation  
-✅ **Agile Methodology:** Scrum with 4 sprints of 2 weeks  
-✅ **Code Standards:** Checkstyle (0 violations) + SpotBugs configured  
-✅ **Professional Logging:** SLF4J + Logback infrastructure  
-✅ **Dependency Management:** All licenses verified and compatible  
-
-### Technical Achievements
-
-🎯 **35,123** properties successfully processed  
-🎯 **14,988** adjacency relationships mapped  
-🎯 **1,005** unique owners identified  
-🎯 **92** unit tests implemented and passing  
-🎯 **95%** instruction coverage achieved (beats Google: 80%, Microsoft: 75%)  
-🎯 **82%** branch coverage achieved (beats industry target: 70%)  
-🎯 **0** security bugs or reliability issues  
-🎯 **Grade A** maintainability rating  
-🎯 **3.2%** code duplication (below 5% threshold)  
-🎯 **8 hours** technical debt (below 1 day threshold)  
-
-### Industry Comparison
-
-| Metric | This Project | Google | Microsoft | Netflix | Spring Framework |
-|--------|-------------|--------|-----------|---------|------------------|
-| **Coverage** | **95%** 🏆 | 80% | 75% | 80% | 85% |
-| **Bugs** | **0** ✅ | <5/KLOC | <3/KLOC | - | <2/KLOC |
-| **Vulnerabilities** | **0** ✅ | - | - | - | - |
-| **Code Smells** | **198** | 5000+ | 8000+ | - | 5000+ |
-| **Tech Debt** | **8h** | 200d | 500d | - | 200d |
-
-**Conclusion:** This project achieves **top 5% industry standards** in code coverage while maintaining **zero critical issues**.
-
----
-
-## 📚 Learning Outcomes
-
-This project demonstrates mastery of:
-
-### Technical Skills
-- ✅ Java 21 features (Records, Switch Expressions, Text Blocks)
-- ✅ Maven build automation and dependency management
-- ✅ JUnit 5 advanced testing (parameterized tests, lifecycle hooks)
-- ✅ Graph algorithms implementation (DFS, BFS, connected components)
-- ✅ Spatial data processing with JTS
-- ✅ JavaFX GUI development
-- ✅ Professional logging with SLF4J + Logback
-- ✅ CSV parsing with Apache Commons
-
-### Software Engineering Practices
-- ✅ Agile/Scrum methodology (4 sprints, user stories, retrospectives)
-- ✅ CI/CD pipeline design and implementation
-- ✅ Code quality automation (SonarCloud, Checkstyle, SpotBugs)
-- ✅ Test-driven development mindset
-- ✅ SOLID principles application
-- ✅ Design patterns (Factory, Strategy, Facade, MVC)
-- ✅ License compliance and SBOM generation
-- ✅ Git workflow (feature branches, PRs, semantic commits)
-
-### Professional Skills
-- ✅ Technical documentation writing
-- ✅ Code review best practices
-- ✅ Dependency security management
-- ✅ Performance optimization decisions
-- ✅ Trade-off analysis (completeness vs usability)
-- ✅ Stakeholder communication
-
----
-
 <div align="center">
 
-**Developed with ❤️ for Software Engineering Excellence**
+**Developed for Software Engineering**
 
-**Università degli Studi del Sannio | 2024/2025**
+**Università degli Studi del Sannio | 2025/2026**
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=pprim0_ES-2025-Sannio-LandManagement&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=pprim0_ES-2025-Sannio-LandManagement)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=pprim0_ES-2025-Sannio-LandManagement&metric=coverage)](https://sonarcloud.io/summary/new_code?id=pprim0_ES-2025-Sannio-LandManagement)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
----
-
-**"Reducing territorial fragmentation through software engineering excellence"**
-
-*This project demonstrates that academic work can achieve professional-grade quality standards when proper software engineering practices are consistently applied.*
 
 </div>

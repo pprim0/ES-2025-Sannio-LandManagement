@@ -1,16 +1,126 @@
 Land Management System
-Copyright 2025 Primo - University of Sannio
+Copyright (c) 2025-2026 Pedro Primo - Università degli Studi del Sannio
 
-This product includes software developed at:
-- University of Sannio, Benevento, Italy
-- Professor: Massimiliano Di Penta
+This product includes software developed as part of the Software Engineering
+course at Università degli Studi del Sannio, Benevento, Italy.
 
-Third-party dependencies and their licenses:
-See target/generated-sources/license/THIRD-PARTY.txt for complete list
+Course Instructor: Professor Massimiliano Di Penta
+Academic Year: 2025/2026
+Project: Territorial Management System for Rural Properties
 
-Main dependencies:
-- JGraphT (LGPL 2.1 / EPL 2.0)
-- JavaFX (GPL with Classpath Exception)
-- JUnit 5 (Eclipse Public License 2.0)
-- Apache Commons CSV (Apache License 2.0)
-- GSON (Apache License 2.0)
+================================================================================
+THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
+================================================================================
+
+This product includes or depends upon the following third-party software
+components. See target/generated-sources/license/THIRD-PARTY.txt for the
+complete list of all dependencies and their respective licenses.
+
+--------------------------------------------------------------------------------
+MAIN DEPENDENCIES
+--------------------------------------------------------------------------------
+
+1. JGraphT Core (https://jgrapht.org/)
+   Version: 1.5.2
+   License: GNU Lesser General Public License v2.1 or later (LGPL-2.1-or-later)
+            OR Eclipse Public License 2.0 (EPL-2.0)
+   Copyright: Copyright (c) 2003-2023 JGraphT contributors
+   Use: Graph data structures and algorithms (adjacency graphs, DFS, BFS)
+
+2. JavaFX Controls & FXML (https://openjfx.io/)
+   Version: 21.0.1
+   License: GNU General Public License v2 with Classpath Exception
+   Copyright: Copyright (c) 2013, 2023, Oracle and/or its affiliates
+   Use: Graphical user interface framework
+
+3. JUnit Jupiter (https://junit.org/junit5/)
+   Version: 5.10.1
+   License: Eclipse Public License 2.0 (EPL-2.0)
+   Copyright: Copyright (c) 2015-2024 The JUnit Team
+   Use: Unit testing framework
+
+4. Google GSON (https://github.com/google/gson)
+   Version: 2.10.1
+   License: Apache License 2.0
+   Copyright: Copyright (c) 2008 Google Inc.
+   Use: JSON serialization and deserialization
+
+5. Apache Commons CSV (https://commons.apache.org/proper/commons-csv/)
+   Version: 1.10.0
+   License: Apache License 2.0
+   Copyright: Copyright (c) 2005-2023 The Apache Software Foundation
+   Use: Professional CSV file parsing and processing
+
+6. JTS Topology Suite (https://github.com/locationtech/jts)
+   Version: 1.19.0
+   License: Eclipse Distribution License 1.0 (EDL-1.0)
+            OR Eclipse Public License 2.0 (EPL-2.0)
+   Copyright: Copyright (c) 2016-2023 LocationTech
+   Use: Geometric operations and spatial data processing (WKT parsing)
+
+7. SLF4J API (https://www.slf4j.org/)
+   Version: 2.0.9
+   License: MIT License
+   Copyright: Copyright (c) 2004-2023 QOS.ch
+   Use: Logging facade (Simple Logging Facade for Java)
+
+8. Logback Classic (https://logback.qos.ch/)
+   Version: 1.4.14
+   License: Eclipse Public License 1.0 (EPL-1.0)
+            OR GNU Lesser General Public License v2.1 (LGPL-2.1)
+   Copyright: Copyright (c) 1999-2023 QOS.ch
+   Use: Logging implementation (backend for SLF4J)
+
+--------------------------------------------------------------------------------
+BUILD AND QUALITY ASSURANCE TOOLS
+--------------------------------------------------------------------------------
+
+The following tools are used during build and development but are not
+included in the final distribution:
+
+- Maven (Apache License 2.0) - Build automation
+- JaCoCo (Eclipse Public License 2.0) - Code coverage analysis
+- CycloneDX Maven Plugin (Apache License 2.0) - SBOM generation
+- License Maven Plugin (Apache License 2.0) - License management
+- Checkstyle (LGPL 2.1) - Code style verification
+- SpotBugs (LGPL 2.1) - Static analysis
+
+--------------------------------------------------------------------------------
+DATA ATTRIBUTION
+--------------------------------------------------------------------------------
+
+Dataset: Madeira Rural Properties
+Source: Região Autónoma da Madeira - Open Data Initiative
+Records: 35,123 rural properties
+Format: CSV with WKT geometries
+License: Open Data License (educational and research use permitted)
+
+--------------------------------------------------------------------------------
+LICENSE COMPATIBILITY
+--------------------------------------------------------------------------------
+
+All third-party dependencies have been verified for compatibility with the
+MIT License under which this project is distributed. The use of LGPL and
+GPL with Classpath Exception libraries is permitted as they allow linking
+without viral licensing effects.
+
+For detailed license information:
+- See LICENSE file for this project's MIT License
+- See target/generated-sources/license/THIRD-PARTY.txt for complete dependency list
+- See target/bom.json for Software Bill of Materials (SBOM) in CycloneDX format
+
+--------------------------------------------------------------------------------
+ACKNOWLEDGMENTS
+--------------------------------------------------------------------------------
+
+Special thanks to:
+- Professor Massimiliano Di Penta for guidance and mentorship
+- Università degli Studi del Sannio for academic support
+- All open-source contributors whose libraries made this project possible
+- The Erasmus+ program for enabling international academic collaboration
+
+For questions or concerns regarding third-party licenses, please contact:
+pedroprimo@estudante.unisannio.it
+
+Last Updated: December 10, 2025
+Project Version: 1.0.0-SNAPSHOT
