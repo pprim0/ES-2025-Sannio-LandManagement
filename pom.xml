@@ -176,6 +176,7 @@
                 <configuration>
                     <excludes>
                         <exclude>**/GestaoTerritorioApp.class</exclude>
+                        <exclude>**/TestarExportadores.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>
