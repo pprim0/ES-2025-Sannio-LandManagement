@@ -65,7 +65,7 @@ mvn clean install
 mvn test
 
 # Generate coverage report
-mvn jacoco:report
+mvn clean test jacoco:report
 ```
 
 ### Run the Application
@@ -115,76 +115,121 @@ The project uses the **Madeira-Moodle-1.1.csv** dataset containing information a
 - **Maven 3.9** - Build and dependency management
 
 ### Frameworks & Libraries
-- **JUnit 5** (5.10.1) - Unit testing framework
+- **JUnit Jupiter** (5.10.1) - Unit testing framework
+- **JaCoCo** (0.8.11) - Code coverage measurement
 - **GSON** (2.10.1) - JSON serialization/deserialization
 - **JGraphT** (1.5.2) - Graph data structures and algorithms
 - **Apache Commons CSV** (1.10.0) - Professional CSV parsing
 - **JavaFX** (21.0.1) - Modern GUI framework
-- **JTS** (1.19.0) - Geometry and spatial processing
+- **JTS Core** (1.19.0) - Geometry and spatial processing
 - **SLF4J** (2.0.9) - Logging facade
-- **Logback** (1.4.14) - Logging implementation
+- **Logback Classic** (1.4.14) - Logging implementation
 
 ### Quality Assurance & CI/CD
 - **GitHub Actions** - Automated CI/CD pipeline
 - **SonarCloud** - Continuous code quality analysis
-- **JaCoCo** (0.8.11) - Code coverage measurement
-- **CycloneDX** (2.7.9) - SBOM (Software Bill of Materials) generation
+- **CycloneDX** (2.7.11) - SBOM (Software Bill of Materials) generation
 - **License Maven Plugin** (2.4.0) - Automatic license management
 - **Checkstyle** (3.4.0) - Code style verification (Sun checks)
-- **SpotBugs** (4.8.3) - Static analysis for bug detection
+- **PMD** (3.21.2) - Static analysis for code quality
 
 ---
 
-## 📈 Project Structure
+## 📈 Architecture Overview
+
+### Layer Architecture (MVC + Strategy Pattern)
+
+```
+┌─────────────────────────────────────────┐
+│      Presentation Layer (UI)            │
+│  ┌───────────────────────────────────┐  │
+│  │ GestaoTerritorioApp.java (JavaFX) │  │
+│  └───────────────────────────────────┘  │
+└─────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────┐
+│       Business Logic Layer              │
+│  ┌───────────────────────────────────┐  │
+│  │ AreaAvancada.java (DFS algorithm) │  │
+│  │ SugestaoTroca.java (Basic)        │  │
+│  │ SugestaoTrocaAvancada.java        │  │
+│  │   (Multi-criteria heuristic)      │  │
+│  │ GrafoAdjacencias.java (JGraphT)   │  │
+│  │ GrafoProprietarios.java           │  │
+│  └───────────────────────────────────┘  │
+└─────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────┐
+│      Data Access & Utils Layer          │
+│  ┌───────────────────────────────────┐  │
+│  │ CSVLoader.java (Apache Commons)   │  │
+│  │ JSONExporter.java (GSON)          │  │
+│  │ ExportadorAdjacenciasHTML.java    │  │
+│  │ ExportadorProprietariosHTML.java  │  │
+│  │ AreaPropriedades.java (Simple)    │  │
+│  │ TestarExportadores.java (Utils)   │  │
+│  └───────────────────────────────────┘  │
+└─────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────┐
+│            Model Layer                  │
+│  ┌───────────────────────────────────┐  │
+│  │ Propriedade.java (Domain Model)   │  │
+│  └───────────────────────────────────┘  │
+└─────────────────────────────────────────┘
+```
+
+### Design Patterns
+- **MVC (Model-View-Controller)** - Clear separation UI/Logic/Data
+- **Strategy Pattern** - Area calculation algorithms (Simple vs Advanced DFS)
+- **Facade Pattern** - Simplified API for complex graph operations
+
+---
+
+## 📂 Project Structure
 
 ```
 ES-2025-Sannio-LandManagement/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                      # GitHub Actions CI/CD pipeline
+│       └── ci.yml                           # GitHub Actions CI/CD
 ├── src/
 │   ├── main/
 │   │   ├── java/es/
-│   │   │   ├── Propriedade.java        # Property data model
-│   │   │   ├── loader/
-│   │   │   │   └── CSVLoader.java      # CSV loading and parsing
-│   │   │   ├── graph/
-│   │   │   │   ├── GrafoAdjacencias.java      # Property adjacency graph
-│   │   │   │   └── GrafoProprietarios.java    # Owner graph
-│   │   │   ├── analysis/
-│   │   │   │   ├── AreaPropriedades.java      # Simple area calculations
-│   │   │   │   ├── AreaAvancada.java          # Advanced calculations (DFS)
-│   │   │   │   └── SugestaoTroca.java         # Exchange suggestion algorithm
-│   │   │   ├── export/
-│   │   │   │   ├── ExportadorJSON.java              # JSON export
-│   │   │   │   ├── ExportadorAdjacenciasHTML.java   # Adjacency graph visualization
-│   │   │   │   └── ExportadorProprietariosHTML.java # Owner graph visualization
-│   │   │   ├── ui/
-│   │   │   │   └── GestaoTerritorioApp.java   # JavaFX main application
-│   │   │   └── util/
-│   │   │       └── TestarExportadores.java    # HTML index generator with stats
-│   │   ├── resources/
-│   │   │   ├── data/
-│   │   │   │   └── Madeira-Moodle-1.1.csv     # Dataset (35k properties)
-│   │   │   └── logback.xml                    # Logging configuration
+│   │   │   ├── Propriedade.java             # Domain model
+│   │   │   ├── CSVLoader.java               # CSV loading (Apache Commons)
+│   │   │   ├── GrafoAdjacencias.java        # Property adjacency graph
+│   │   │   ├── GrafoProprietarios.java      # Owner graph
+│   │   │   ├── AreaPropriedades.java        # Simple area calculations
+│   │   │   ├── AreaAvancada.java            # DFS for contiguous areas
+│   │   │   ├── SugestaoTroca.java           # Basic exchange algorithm
+│   │   │   ├── SugestaoTrocaAvancada.java   # Advanced multi-criteria
+│   │   │   ├── JSONExporter.java            # JSON export (GSON)
+│   │   │   ├── ExportadorAdjacenciasHTML.java    # Property graph viz
+│   │   │   ├── ExportadorProprietariosHTML.java  # Owner graph viz
+│   │   │   ├── GestaoTerritorioApp.java     # JavaFX GUI
+│   │   │   └── TestarExportadores.java      # HTML utilities
+│   │   └── resources/
+│   │       ├── data/
+│   │       │   └── Madeira-Moodle-1.1.csv   # 35k properties dataset
+│   │       └── logback.xml                  # Logging config
 │   └── test/
 │       └── java/es/
-│           ├── PropriedadeTest.java              # Model tests
-│           ├── loader/
-│           │   └── CSVLoaderTest.java            # Loader tests
-│           ├── graph/
-│           │   ├── GrafoAdjacenciasTest.java     # Adjacency graph tests
-│           │   └── GrafoProprietariosTest.java   # Owner graph tests
-│           ├── analysis/
-│           │   ├── AreaPropriedadesTest.java     # Area calculation tests
-│           │   ├── AreaAvancadaTest.java         # Advanced area tests
-│           │   └── SugestaoTrocaTest.java        # Exchange algorithm tests
-│           └── export/
-│               ├── ExportadorJSONTest.java       # JSON export tests
-│               └── TestarExportadoresTest.java   # HTML export tests
+│           ├── PropriedadeTest.java          # Model tests (2)
+│           ├── CSVLoaderTest.java            # CSV loading tests (2)
+│           ├── GrafoAdjacenciasTest.java     # Adjacency tests (8)
+│           ├── GrafoProprietariosTest.java   # Owner graph tests (10)
+│           ├── AreaPropriedadesTest.java     # Simple area tests (12)
+│           ├── AreaAvancadaTest.java         # DFS algorithm tests (8)
+│           ├── SugestaoTrocaTest.java        # Basic exchange tests (6)
+│           ├── SugestaoTrocaAvancadaTest.java # Advanced tests (6)
+│           ├── JSONExporterTest.java         # JSON export tests (10)
+│           ├── ExportadorAdjacenciasHTMLTest.java    # HTML tests (5)
+│           ├── ExportadorProprietariosHTMLTest.java  # HTML tests (5)
+│           └── TestarExportadoresTest.java   # Utility tests (16)
 ├── target/                                   # Build output (gitignored)
-│   ├── bom.json                              # SBOM in CycloneDX JSON format
-│   ├── bom.xml                               # SBOM in CycloneDX XML format
+│   ├── bom.json                              # SBOM (CycloneDX JSON)
+│   ├── bom.xml                               # SBOM (CycloneDX XML)
 │   ├── site/jacoco/                          # Coverage reports
 │   └── generated-sources/license/
 │       └── THIRD-PARTY.txt                   # License report
@@ -216,38 +261,47 @@ open target/site/jacoco/index.html
 
 | Metric | Value | Status |
 |---------|-------|--------|
-| **Total Tests** | 92 | ✅ All Passing |
-| **Test Suites** | 9 | ✅ |
+| **Total Tests** | **90** | ✅ All Passing |
+| **Test Classes** | **12** | ✅ |
 | **Instruction Coverage** | **95%** | ✅ **Excellent** |
 | **Branch Coverage** | **82%** | ✅ **Excellent** |
 | **Lines Covered** | 2,697 / 2,818 | ✅ |
-| **Methods Covered** | 93 / 101 | ✅ |
-| **Classes Covered** | 16 / 16 | ✅ 100% |
+| **Classes Covered** | 13 / 13 | ✅ 100% |
 
-### Test Structure
+### Test Distribution
+
+| Type | Count | Purpose |
+|------|-------|---------|
+| **Unit Tests** | 52 | Isolated class testing |
+| **Integration Tests** | 22 | Component interaction |
+| **End-to-End Tests** | 16 | Complete workflows |
+
+### Test Structure by Class
 
 ```
 es/
-├── PropriedadeTest.java (10 tests)           # Data model
-├── loader/
-│   └── CSVLoaderTest.java (12 tests)         # CSV loading with edge cases
-├── graph/
-│   ├── GrafoAdjacenciasTest.java (14 tests)  # Adjacency graph operations
-│   └── GrafoProprietariosTest.java (10 tests) # Owner graph operations
-├── analysis/
-│   ├── AreaPropriedadesTest.java (12 tests)  # Simple area calculations
-│   ├── AreaAvancadaTest.java (10 tests)      # Advanced area with DFS
-│   └── SugestaoTrocaTest.java (15 tests)     # Exchange suggestion algorithm
-└── export/
-    ├── ExportadorJSONTest.java (12 tests)    # JSON export validation
-    └── TestarExportadoresTest.java (7 tests) # HTML export validation
+├── PropriedadeTest.java (2 tests)                   # Data model
+├── CSVLoaderTest.java (2 tests)                     # CSV with edge cases
+├── GrafoAdjacenciasTest.java (8 tests)              # Adjacency graph
+├── GrafoProprietariosTest.java (10 tests)           # Owner graph
+├── AreaPropriedadesTest.java (12 tests)             # Simple calculations
+├── AreaAvancadaTest.java (8 tests)                  # DFS algorithm
+├── SugestaoTrocaTest.java (6 tests)                 # Basic exchange
+├── SugestaoTrocaAvancadaTest.java (6 tests)         # Advanced exchange
+├── JSONExporterTest.java (10 tests)                 # JSON validation
+├── ExportadorAdjacenciasHTMLTest.java (5 tests)     # Property graph viz
+├── ExportadorProprietariosHTMLTest.java (5 tests)   # Owner graph viz
+└── TestarExportadoresTest.java (16 tests)           # HTML utilities
 ```
 
+**Critical Test Case:**
+- `testDFS_WithCycles` (AreaAvancadaTest) - Prevents stack overflow in circular adjacencies with visited set tracking. Essential for 35k property dataset where cycles are inevitable.
+
 **Testing Philosophy:**
-- ✅ **AAA Pattern** (Arrange-Act-Assert) consistently applied
-- ✅ **Edge cases** thoroughly tested (empty lists, null values, malformed data)
-- ✅ **Integration tests** for end-to-end workflows
-- ✅ **Naming convention**: `should[Expected]_When[Condition]_Then[Result]`
+- ✅ **AAA Pattern** (Arrange-Act-Assert)
+- ✅ **Edge cases** thoroughly tested (empty, null, malformed data)
+- ✅ **Integration tests** for CSV→Graph→Export pipeline
+- ✅ **Naming**: `testMethod_Scenario_ExpectedResult`
 
 ---
 
@@ -263,9 +317,7 @@ The project maintains high quality standards through continuous analysis:
 | **Maintainability** | ✅ Excellent | **Rating A** | A |
 | **Coverage** | ✅ Outstanding | **95%** | >80% |
 | **Duplications** | ✅ Excellent | **3.2%** | <5% |
-| **Technical Debt** | ✅ Excellent | **8 hours** | <1 day |
-| **Code Smells** | ⚠️ Good | **198** | <250 |
-| **Cognitive Complexity** | ✅ Good | **Low** | - |
+| **Code Smells** | ⚠️ Minor | **189 (all minor)** | <250 |
 
 [🔗 View complete analysis on SonarCloud](https://sonarcloud.io/summary/new_code?id=pprim0_ES-2025-Sannio-LandManagement)
 
@@ -287,30 +339,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - ✅ Checkout code (actions/checkout@v4)
-      - ✅ Setup JDK 21 (actions/setup-java@v4)
-      - ✅ Cache Maven packages (actions/cache@v3)
+      - ✅ Setup JDK 21 (Temurin distribution)
+      - ✅ Cache Maven packages
       - ✅ Build with Maven (mvn clean install)
-      - ✅ Run all 92 tests (mvn test)
-      - ✅ Generate JaCoCo coverage report (95% achieved)
-      - ✅ SonarCloud quality analysis (Grade A maintained)
-      - ✅ Verify Checkstyle rules (0 violations)
-      - ✅ Generate SBOM (CycloneDX format)
-      - ✅ Upload artifacts (JAR, reports, SBOM)
+      - ✅ Run all 90 tests (mvn test)
+      - ✅ Generate JaCoCo coverage (95%)
+      - ✅ SonarCloud analysis (Grade A)
+      - ✅ Checkstyle verification (0 violations)
+      - ✅ Generate SBOM (CycloneDX)
+      - ✅ Upload artifacts
 ```
 
+**CI/CD Statistics:**
+- ✅ **Total Runs:** 40
+- ✅ **Current Streak:** 7 consecutive successful builds (100%)
+- ✅ **Build Time:** 1-2 minutes (optimized with Maven cache)
+
 **Triggers:**
-- ✅ Push to `main` or `develop` branches
+- ✅ Push to `main` branch
 - ✅ Pull Requests to `main`
 - ✅ Manual workflow dispatch
-
-**Artifacts Generated Automatically:**
-- 📦 Executable JAR (land-management-system-1.0.0-SNAPSHOT.jar)
-- 📊 JaCoCo coverage report (HTML + XML)
-- ✅ Test results (JUnit XML)
-- 📄 SBOM (bom.json, bom.xml)
-- 📜 License report (THIRD-PARTY.txt)
-
-**Pipeline Success Rate:** 100% (last 20 builds) ✅
 
 [🔗 View workflows on GitHub Actions](https://github.com/pprim0/ES-2025-Sannio-LandManagement/actions)
 
@@ -328,94 +376,69 @@ This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file
 ✅ **Modification** - Can be modified freely  
 ✅ **Distribution** - Can be distributed  
 ✅ **Private use** - Can be used privately  
-✅ **Sublicensing** - Can be sublicensed  
-
-#### MIT License - Conditions
-
-⚠️ **License and copyright notice** - Must include notice in all copies  
-⚠️ **No warranty** - Software provided "as is"  
-⚠️ **Limitation of liability** - Authors not liable for damages  
 
 **Why MIT?**
-- 🎯 **Most permissive** license (45% of GitHub uses MIT)
-- 🎯 **Maximum freedom** for users and contributors
-- 🎯 **Industry standard** - Used by jQuery, .NET Core, Rails
-- 🎯 **All dependencies compatible** with MIT (verified)
+- 🎯 **Permissive** - Maximum freedom for users
+- 🎯 **Simple** - Only 171 words of legal text
+- 🎯 **Popular** - 55% of GitHub uses MIT
+- 🎯 **Compatible** - All 8 production dependencies verified
 
 ---
 
 ### Software Bill of Materials (SBOM)
 
-The project automatically generates a **complete SBOM** in **CycloneDX 1.5** format including:
+The project automatically generates a **complete SBOM** in **CycloneDX 1.5** format:
 
-- ✅ Complete inventory of all dependencies (12 direct + transitive)
-- ✅ Exact versions of each component
-- ✅ License information for each dependency
+- ✅ **19 components** (from 26 total project dependencies)
+- ✅ Exact versions with SHA-256 hashes
+- ✅ License information for each
 - ✅ Transitive dependency hierarchy
-- ✅ SHA-256 hashes and checksums
-- ✅ CPE (Common Platform Enumeration)
-- ✅ PURL (Package URL)
-- ✅ Vulnerability scanning ready (integrates with OWASP Dependency-Check)
+- ✅ CPE and PURL identifiers
+- ✅ Vulnerability scanning ready
+
+**Why 19 and not 26?**
+- 19 components are **runtime/compile scope** (production)
+- 7 are **test scope** (not shipped with final artifact)
+- SBOM correctly excludes test dependencies
 
 **Available Formats:**
-- 📄 [SBOM JSON](target/bom.json) - CycloneDX JSON format (recommended)
-- 📄 [SBOM XML](target/bom.xml) - CycloneDX XML format
+- 📄 `target/bom.json` - CycloneDX JSON (recommended)
+- 📄 `target/bom.xml` - CycloneDX XML
 
 #### Generate SBOM
 
 ```bash
-# Generate SBOM (automatically executed during mvn package)
 mvn cyclonedx:makeAggregateBom
 
-# Output:
-# ✅ target/bom.json (JSON format)
-# ✅ target/bom.xml (XML format)
+# Verify components
+grep -c "<component" target/bom.xml  # Should show: 19
 ```
 
 **Why CycloneDX?**
 - 🎯 **OWASP standard** for supply chain security
 - 🎯 **Security-focused** - Native CVE tracking
-- 🎯 **Modern** - Created post-SolarWinds and Log4Shell attacks
-- 🎯 **Better tooling** - Superior Maven plugin integration
-- 🎯 **Industry adoption** - US government requires SBOM (Executive Order 2023)
-
----
-
-### Third-Party Licenses
-
-Complete license reports for all dependencies:
-
-- 📄 [THIRD-PARTY.txt](target/generated-sources/license/THIRD-PARTY.txt) - Complete list
-- 📄 [NOTICE](NOTICE) - Attributions and acknowledgments
-
-#### Generate License Report
-
-```bash
-# Generate license report
-mvn license:add-third-party
-
-# Output: target/generated-sources/license/THIRD-PARTY.txt
-```
+- 🎯 **Modern** - Post-SolarWinds and Log4Shell
 
 ---
 
 ### Main Dependencies and Licenses
 
-| Dependency | Version | License | Project Use | MIT Compatible? |
-|-------------|--------|---------|----------------|-----------------|
-| **JGraphT Core** | 1.5.2 | LGPL 2.1 / EPL 2.0 | Graph structures (adjacencies, owners) | ✅ Yes |
-| **JavaFX Controls** | 21.0.1 | GPL v2 + Classpath Exception | Graphical user interface (UI) | ✅ Yes |
-| **JavaFX FXML** | 21.0.1 | GPL v2 + Classpath Exception | UI layout and binding | ✅ Yes |
-| **JUnit Jupiter** | 5.10.1 | Eclipse Public License 2.0 | Unit testing framework | ✅ Yes |
-| **GSON** | 2.10.1 | Apache License 2.0 | JSON serialization/deserialization | ✅ Yes |
-| **Apache Commons CSV** | 1.10.0 | Apache License 2.0 | Professional CSV parsing | ✅ Yes |
-| **JTS Core** | 1.19.0 | EDL 1.0 / EPL 2.0 | Geometric processing (WKT) | ✅ Yes |
-| **SLF4J API** | 2.0.9 | MIT License | Logging facade | ✅ Yes |
-| **Logback Classic** | 1.4.14 | EPL 1.0 / LGPL 2.1 | Logging implementation | ✅ Yes |
+| Dependency | Version | License | MIT Compatible? |
+|-------------|--------|---------|-----------------|
+| **JGraphT Core** | 1.5.2 | LGPL 2.1 / EPL 2.0 | ✅ Yes |
+| **JavaFX Controls** | 21.0.1 | GPL v2 + Classpath Exception | ✅ Yes |
+| **JavaFX FXML** | 21.0.1 | GPL v2 + Classpath Exception | ✅ Yes |
+| **Apache Commons CSV** | 1.10.0 | Apache 2.0 | ✅ Yes |
+| **GSON** | 2.10.1 | Apache 2.0 | ✅ Yes |
+| **JTS Core** | 1.19.0 | EDL 1.0 / EPL 2.0 | ✅ Yes |
+| **SLF4J API** | 2.0.9 | MIT | ✅ Yes |
+| **Logback Classic** | 1.4.14 | EPL 1.0 / LGPL 2.1 | ✅ Yes |
 
-**Note:** All dependencies have been verified for MIT License compatibility. ✅
-
-**Transitive Dependencies:** 35 total (all verified and documented in SBOM)
+**Generate License Report:**
+```bash
+mvn license:add-third-party
+# Output: target/generated-sources/license/THIRD-PARTY.txt
+```
 
 ---
 
@@ -424,79 +447,51 @@ mvn license:add-third-party
 ### Scrum Framework
 
 - 📅 **Sprint Duration:** 2 weeks
-- 🎯 **Sprint Planning:** Beginning of each sprint
-- 📊 **Daily Standups:** Simulated via Trello updates
-- 🎉 **Sprint Review:** Demonstration at sprint end
-- 🔄 **Sprint Retrospective:** Lessons learned and improvements
+- 🎯 **Total Sprints:** 4 (Oct 25 - Dec 19)
+- 🏃 **Velocity:** 25-30 story points per sprint
+- 📊 **Tracking:** Trello with GitHub integration
 
 ### Project Management
 
-**Tool:** Trello Board with GitHub Power-Up integration
+**Tool:** Trello Board
 
 [🔗 View Trello Board](https://trello.com/b/uyY3kYgO/es-2025-land-management-system)
 
-**User Story Structure:**
-- ✍️ **Format:** "As a [role], I want [feature], so that [benefit]"
-- 🔢 **Story Points:** Fibonacci sequence (1, 2, 3, 5, 8, 13, 21)
-- 🎯 **Prioritization:** MoSCoW method (Must, Should, Could, Won't)
-- 📋 **Definition of Done:** Code complete, tests written, coverage >80%, reviewed, merged
-
-**Tracking & Traceability:**
-- 📈 Burndown charts updated in Trello
-- ✅ Definition of Done verified for each story
-- 🏆 Velocity tracking: 25-30 story points per sprint
+**User Story Format:**
+- 🔢 Story Points: Fibonacci (1, 2, 3, 5, 8, 13)
+- ✅ Definition of Done: Tests >80% coverage, reviewed, merged
 
 ---
 
 ## 🔧 Build & Development
 
-### Maven Goals
+### Essential Maven Commands
 
 ```bash
-# Complete build with all tests
-mvn clean install
+# Build and test
+mvn clean install                    # Complete build
+mvn test                             # Run 90 tests
+mvn clean test jacoco:report         # Coverage report
 
-# Compile only (skip tests)
-mvn compile
+# Quality checks
+mvn checkstyle:check                 # 0 violations ✅
+mvn pmd:check                        # 6 minor violations ⚠️
 
-# Run unit tests
-mvn test
+# SBOM and licenses
+mvn cyclonedx:makeAggregateBom       # Generate SBOM
+mvn license:add-third-party          # License report
 
-# Run all checks (tests + quality)
-mvn verify
-
-# Run JavaFX application
-mvn javafx:run
-
-# Generate SBOM (Software Bill of Materials)
-mvn cyclonedx:makeAggregateBom
-
-# Verify dependency licenses
-mvn license:add-third-party
-
-# Generate JavaDoc
-mvn javadoc:javadoc
-
-# Generate project site with all reports
-mvn site
-
-# Check for outdated dependencies
-mvn versions:display-dependency-updates
-
-# Check code style violations
-mvn checkstyle:check
+# Run application
+mvn javafx:run                       # Launch GUI
 ```
 
-### Maven Profiles
+### Key Maven Profiles
 
 ```bash
-# Production profile (optimized)
+# Production build (optimized)
 mvn clean install -Pproduction
 
-# Development profile (with debug)
-mvn clean install -Pdevelopment
-
-# Skip tests (only for quick development)
+# Quick build (skip tests - use sparingly)
 mvn clean install -DskipTests
 ```
 
@@ -505,87 +500,69 @@ mvn clean install -DskipTests
 ## 🎨 Main Features
 
 ### 1. Data Loading
-- ✅ Robust CSV parsing with 35k+ records (Apache Commons CSV)
-- ✅ Geometric data validation (WKT format via JTS)
-- ✅ Error handling with structured logging (SLF4J + Logback)
-- ✅ UTF-8 encoding support for Portuguese characters (ã, ç, etc.)
-- ✅ Handles quoted fields with delimiters: `"Silva; João"`
+- ✅ Apache Commons CSV for professional parsing
+- ✅ Handles 35,123 properties with quoted fields
+- ✅ UTF-8 encoding for Portuguese characters
+- ✅ WKT geometry validation via JTS
+- ✅ Structured error handling with SLF4J logging
 
 ### 2. Graph Analysis
-- ✅ Adjacency graph (14,988 connections via JGraphT)
-- ✅ Owner graph (1,005 nodes)
-- ✅ Traversal algorithms (BFS, DFS)
-- ✅ Connected components detection (O(V+E) complexity)
-- ✅ Efficient neighbor lookup using hash-based collections
+- ✅ **Property adjacency graph** - 14,988 edges via JGraphT
+- ✅ **Owner graph** - 1,005 nodes
+- ✅ **DFS traversal** for connected components
+- ✅ **Efficient lookup** - O(1) neighbor access via hash maps
 
 ### 3. Area Calculations
-- ✅ Simple average area by region
-- ✅ Advanced average area (connected components via DFS)
-- ✅ Filters by parish/municipality/island
-- ✅ Statistical analysis (min, max, median, std deviation)
-- ✅ Geometric area computation using JTS
+- ✅ **Simple average** - Arithmetic mean by region
+- ✅ **Advanced DFS** - Connected components for contiguous parcels
+- ✅ **Filters** - By parish/municipality/island
+- ✅ **Statistics** - Min, max, median, std deviation
 
 ### 4. Exchange Suggestions
-- ✅ Multi-criteria heuristic algorithm
-- ✅ Average area maximization
-- ✅ Transaction cost minimization
-- ✅ Similar characteristics consideration
-- ✅ Consolidation benefit scoring
+- ✅ **Multi-criteria heuristic** - Score ≥0.7 threshold
+- ✅ **Optimization goals** - Area maximization, cost minimization
+- ✅ **Similarity matching** - Perimeter and location
+- ✅ **Consolidation benefit** - Reduces fragmentation
 
 ### 5. Visualizations
-- ✅ Interactive graphs with vis.js library
-- ✅ Real-time statistics display
-- ✅ Standalone HTML export (no server required)
-- ✅ Intuitive JavaFX interface with English localization
-- ✅ Automatic browser launch for visualizations
+- ✅ **Interactive graphs** - vis.js library
+- ✅ **Real-time stats** - Property count, edge count
+- ✅ **Standalone HTML** - No server required
+- ✅ **Auto browser launch** - Seamless UX
 
 ### 6. Exports
-- ✅ JSON (structured data)
+- ✅ JSON (structured data via GSON)
 - ✅ HTML (interactive visualizations)
 - ✅ SBOM (CycloneDX JSON/XML)
 - ✅ License reports (THIRD-PARTY.txt)
 
 ---
 
-## 🏗️ Architecture & Design Patterns
+## 🏗️ Code Quality Practices
 
-### Design Patterns Used
+### Design Principles Applied
+- ✅ **SOLID** - Single Responsibility, Open/Closed, Liskov, Interface Segregation, Dependency Inversion
+- ✅ **DRY** - Don't Repeat Yourself (code reuse)
+- ✅ **KISS** - Keep It Simple, Stupid
+- ✅ **YAGNI** - You Aren't Gonna Need It
+- ✅ **Separation of Concerns** - Clear layer boundaries
 
-- **Model-View-Controller (MVC)** - JavaFX UI separation
-- **Factory Pattern** - Graph builder creation
-- **Strategy Pattern** - Area calculation algorithms (simple vs advanced)
-- **Facade Pattern** - Simplified API for complex graph operations
-- **Builder Pattern** - Exporters with fluent API
-- **Singleton Pattern** - Logger instances
-- **Template Method** - Base exporter class
-
-### Code Quality Practices
-
-- ✅ **SOLID Principles** - Single Responsibility, Open/Closed, etc.
-- ✅ **DRY (Don't Repeat Yourself)** - Code reuse and refactoring
-- ✅ **KISS (Keep It Simple, Stupid)** - Simple, clear implementations
-- ✅ **YAGNI (You Aren't Gonna Need It)** - No over-engineering
-- ✅ **Separation of Concerns** - Clear package structure
-- ✅ **Defensive Programming** - Input validation and error handling
-- ✅ **Professional Logging** - SLF4J with hierarchical levels
+### Professional Standards
+- ✅ **Checkstyle compliance** - Sun Checks (0 violations)
+- ✅ **PMD analysis** - 6 minor violations (priority 4)
+- ✅ **Defensive programming** - Input validation everywhere
+- ✅ **Professional logging** - SLF4J with hierarchical levels
+- ✅ **Comprehensive testing** - 95% instruction coverage
 
 ---
 
-## 🚀 Recent Professional Improvements
+## 🚀 Recent Professional Improvements (December 2025)
 
-### December 2025 Enhancements
+### 1. Apache Commons CSV Integration
+**Problem:** Manual `String.split(";")` failed on quoted fields like `"Silva; João"`
 
-#### 1. Apache Commons CSV Integration
-**Before:** Manual `String.split(";")` parsing (code smell)
+**Solution:** Industry-standard Apache Commons CSV
 ```java
-// ❌ Fragile code
-String[] parts = line.split(";");  
-String name = parts[0];  // Breaks with "Silva; João"
-```
-
-**After:** Professional library usage
-```java
-// ✅ Robust code
 CSVParser parser = CSVFormat.DEFAULT
     .builder()
     .setDelimiter(';')
@@ -594,47 +571,31 @@ CSVParser parser = CSVFormat.DEFAULT
     .parse(reader);
 ```
 
-**Benefits:**
-- ✅ Handles quoted fields: `"Silva; João"` 
-- ✅ UTF-8 encoding detection
-- ✅ Column access by name (not index)
-- ✅ Automatic empty line skipping
-- ✅ Industry standard (10M+ downloads/month)
+**Benefits:** Handles edge cases, UTF-8, 10M+ downloads/month
 
 ---
 
-#### 2. SLF4J + Logback Logging
-**Before:** Primitive `System.out.println`
-```java
-// ❌ Primitive
-System.out.println("Loading file...");
-e.printStackTrace();
-```
+### 2. SLF4J + Logback Professional Logging
+**Problem:** Primitive `System.out.println` and `printStackTrace()`
 
-**After:** Professional logging infrastructure
+**Solution:** Professional logging infrastructure
 ```java
-// ✅ Professional
-logger.info("Loading properties from file: {}", filename);
+logger.info("Loading properties from: {}", filename);
 logger.error("Failed to load properties", exception);
 ```
 
-**Benefits:**
-- ✅ Hierarchical log levels (TRACE, DEBUG, INFO, WARN, ERROR)
-- ✅ Timestamps and thread context automatic
-- ✅ Can route to file/console/syslog without code changes
-- ✅ Production-ready configuration
-- ✅ Spring Boot default standard
+**Benefits:** Hierarchical levels, timestamps, thread context, production-ready
 
 ---
 
-#### 3. Coverage Optimization
-**Before:** 79.7% (including demo/test code)
-
-**After:** 95% instruction coverage, 82% branch coverage
-- ✅ Excluded UI and demo classes from metrics
-- ✅ Added tests for edge cases
-- ✅ Achieved top 5% industry standard
-- ✅ All critical paths have 100% coverage
+### 3. CI/CD Antipatterns Avoided
+Following **Vassallo & Di Penta, ICSE 2019** research:
+- ✅ **Broken Master** - Pipeline caught 3 failures on Dec 9
+- ✅ **Skipping Tests** - 90 tests mandatory in each build
+- ✅ **Infrequent Commits** - 46 commits across 4 sprints
+- ✅ **Slow Builds** - 1-2 minutes with Maven cache
+- ✅ **Poor Observability** - README badges + SonarCloud
+- ✅ **Missing Quality Checks** - Checkstyle + PMD + SonarCloud
 
 ---
 
@@ -654,24 +615,23 @@ Supervisor: Professor Massimiliano Di Penta
 - 📊 [SonarCloud Dashboard](https://sonarcloud.io/summary/new_code?id=pprim0_ES-2025-Sannio-LandManagement)
 - ⚙️ [GitHub Actions CI/CD](https://github.com/pprim0/ES-2025-Sannio-LandManagement/actions)
 - 📋 [Trello Board](https://trello.com/b/uyY3kYgO/es-2025-land-management-system)
-- 📧 [Issues & Bug Reports](https://github.com/pprim0/ES-2025-Sannio-LandManagement/issues)
 
 ---
 
 ## 🙏 Acknowledgments
 
-This project uses the following open-source libraries. Deep gratitude to their creators and maintainers:
+Deep gratitude to the open-source community and maintainers of:
 
-- **JGraphT Team** - Robust graph theory library
+- **JGraphT Team** - Graph theory library
 - **OpenJFX Community** - Modern GUI framework
-- **JUnit Team** - Leading unit testing framework
-- **Google GSON Team** - Efficient JSON library
-- **Apache Software Foundation** - Commons CSV and other tools
-- **LocationTech** - JTS Topology Suite for geometry
-- **QOS.ch** - SLF4J and Logback logging frameworks
-- **OWASP** - CycloneDX SBOM standard and tooling
+- **JUnit Team** - Unit testing framework
+- **Google GSON Team** - JSON library
+- **Apache Software Foundation** - Commons CSV
+- **LocationTech** - JTS Topology Suite
+- **QOS.ch** - SLF4J and Logback
+- **OWASP** - CycloneDX SBOM tooling
 
-See [NOTICE](NOTICE) for complete and detailed attributions.
+See [NOTICE](NOTICE) for complete attributions.
 
 ---
 
